@@ -1,0 +1,226 @@
+---
+import { courses, areas } from '../data/courses';
+
+const totalCourses = courses.length;
+const totalAreas = areas.length;
+---
+
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Inscrições Abertas — 1° Semestre 2026
+    </div>
+
+    <h1 class="hero-title">
+      Escola Livre de Artes<br/>
+      <span class="hero-title-accent">Arena da Cultura</span>
+    </h1>
+
+    <p class="hero-description">
+      Cursos gratuitos de arte e cultura promovidos pela Prefeitura de Belo Horizonte.
+      Descubra atividades em centros culturais por toda a cidade.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-number">{totalCourses}</span>
+        <span class="stat-label">Cursos</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-number">{totalAreas}</span>
+        <span class="stat-label">Áreas Artísticas</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-number">100%</span>
+        <span class="stat-label">Gratuito</span>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="#cursos" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Ver Cursos
+      </a>
+      <a href="#agenda" class="btn btn-outline">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Agenda
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-decoration" aria-hidden="true">
+    <div class="hero-circle hero-circle-1"></div>
+    <div class="hero-circle hero-circle-2"></div>
+    <div class="hero-circle hero-circle-3"></div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-2xl) 0 var(--space-3xl);
+    background: linear-gradient(180deg, var(--accent-light) 0%, var(--bg) 100%);
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .hero-badge-dot {
+    width: 8px;
+    height: 8px;
+    background: #4CAF50;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    line-height: 1.1;
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+  }
+
+  .hero-title-accent {
+    color: var(--accent);
+  }
+
+  .hero-description {
+    font-size: clamp(0.95rem, 2.5vw, 1.125rem);
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin-bottom: var(--space-xl);
+    line-height: 1.7;
+  }
+
+  .hero-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    padding: var(--space-md) var(--space-lg);
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .stat-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  /* Decorative circles */
+  .hero-decoration {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .hero-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+
+  .hero-circle-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--area-danca-dot);
+    top: -80px;
+    right: -60px;
+  }
+
+  .hero-circle-2 {
+    width: 200px;
+    height: 200px;
+    background: var(--area-musica-dot);
+    bottom: -40px;
+    left: -40px;
+  }
+
+  .hero-circle-3 {
+    width: 150px;
+    height: 150px;
+    background: var(--area-artes-visuais-dot);
+    top: 40%;
+    left: 10%;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      padding: var(--space-3xl) 0;
+    }
+
+    .hero-stats {
+      gap: var(--space-xl);
+      padding: var(--space-lg) var(--space-2xl);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+    }
+  }
+</style>

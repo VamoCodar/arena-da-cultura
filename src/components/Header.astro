@@ -1,0 +1,137 @@
+---
+const navItems = [
+  { href: "#cursos", label: "Cursos" },
+  { href: "#agenda", label: "Agenda" },
+  { href: "#sobre", label: "Sobre" },
+];
+---
+
+<header class="header" id="header">
+  <div class="header-inner container">
+    <a href="#" class="header-logo" aria-label="Início">
+      <span class="logo-icon">🎨</span>
+      <span class="logo-text">
+        <span class="logo-title">Arena da Cultura</span>
+        <span class="logo-subtitle">Escola Livre de Artes</span>
+      </span>
+    </a>
+
+    <nav class="header-nav" aria-label="Navegação principal">
+      {navItems.map(item => (
+        <a href={item.href} class="nav-link">{item.label}</a>
+      ))}
+    </nav>
+
+    <a href="https://form.jotform.com/260393432980662" target="_blank" rel="noopener" class="btn btn-primary btn-sm header-cta">
+      Inscreva-se
+    </a>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250, 250, 248, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    height: 100%;
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .logo-title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+  }
+
+  .logo-subtitle {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .header-nav {
+    display: none;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .nav-link {
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .header-cta {
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 640px) {
+    .header-nav {
+      display: flex;
+    }
+  }
+</style>
+
+<script>
+  // Active nav link based on scroll position
+  const sections = document.querySelectorAll('.section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active',
+            link.getAttribute('href') === `#${entry.target.id}`
+          );
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+</script>

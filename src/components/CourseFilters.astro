@@ -1,0 +1,167 @@
+---
+import { areas, locations } from '../data/courses';
+---
+
+<div class="filters-wrapper">
+  <!-- Area filter chips (horizontal scrollable) -->
+  <div class="filter-group">
+    <div class="filter-chips" id="area-chips" role="radiogroup" aria-label="Filtrar por área">
+      <button class="chip active" data-area="all" role="radio" aria-checked="true">
+        Todas as Áreas
+      </button>
+      {areas.map(area => (
+        <button class="chip" data-area={area} role="radio" aria-checked="false">
+          {area}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <!-- Location dropdown + counter -->
+  <div class="filter-row">
+    <div class="filter-select-wrapper">
+      <svg class="filter-select-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <select id="location-filter" class="filter-select" aria-label="Filtrar por local">
+        <option value="all">Todos os Locais</option>
+        {locations.map(loc => (
+          <option value={loc}>{loc}</option>
+        ))}
+      </select>
+      <svg class="filter-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+
+    <div class="filter-counter" id="filter-counter" aria-live="polite">
+      <span id="counter-number">0</span> cursos
+    </div>
+  </div>
+</div>
+
+<style>
+  .filters-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .filter-group {
+    overflow: hidden;
+    margin: 0 calc(-1 * var(--space-md));
+    padding: 0 var(--space-md);
+  }
+
+  .filter-chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  .filter-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip {
+    scroll-snap-align: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-full);
+    background: white;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    justify-content: space-between;
+  }
+
+  .filter-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 320px;
+  }
+
+  .filter-select-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-muted);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .filter-select {
+    width: 100%;
+    padding: 10px 36px 10px 36px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: white;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .filter-select:hover,
+  .filter-select:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .filter-select-chevron {
+    position: absolute;
+    right: 12px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .filter-counter {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  #counter-number {
+    color: var(--accent);
+    font-size: 1.1rem;
+  }
+
+  @media (min-width: 768px) {
+    .filter-group {
+      margin: 0;
+      padding: 0;
+    }
+  }
+</style>
