@@ -218,10 +218,11 @@ function parseTime(schedule: string): { start: string; end: string } {
 }
 
 function isSpecificDate(schedule: string): boolean {
+  // "ver datas" means recurring with known date range, not specific individual dates
+  if (/ver datas/i.test(schedule)) return false;
   return (
     /^\d{1,2}\/\w{3}/.test(schedule.trim()) ||
-    /^\d{1,2}\s*(e|a)\s*\d{1,2}\/\w{3}/.test(schedule.trim()) ||
-    /ver datas/.test(schedule.toLowerCase())
+    /^\d{1,2}\s*(e|a)\s*\d{1,2}\/\w{3}/.test(schedule.trim())
   );
 }
 
