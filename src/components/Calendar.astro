@@ -218,6 +218,7 @@ const locationsJSON = JSON.stringify(locations);
       dayEvents.length > 0
         ? `${dayEvents.length} curso${dayEvents.length > 1 ? "s" : ""}`
         : "";
+    listingCount.style.display = dayEvents.length > 0 ? "" : "none";
 
     if (dayEvents.length === 0) {
       listingPlaceholder.style.display = "";
@@ -279,7 +280,8 @@ const locationsJSON = JSON.stringify(locations);
   const validStart = "2026-02-01";
   const validEnd = "2026-08-01";
   const todayStr = new Date().toISOString().slice(0, 10);
-  const initialDate = (todayStr >= validStart && todayStr < validEnd) ? todayStr : validStart;
+  const initialDate =
+    todayStr >= validStart && todayStr < validEnd ? todayStr : validStart;
 
   const calendar = new Calendar(calendarEl, {
     plugins: [dayGridPlugin, listPlugin, interactionPlugin],
@@ -289,12 +291,10 @@ const locationsJSON = JSON.stringify(locations);
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: "dayGridMonth,listWeek",
+      right: "",
     },
     buttonText: {
       today: "Hoje",
-      month: "Mês",
-      list: "Lista",
     },
     validRange: {
       start: "2026-02-01",
@@ -345,6 +345,8 @@ const locationsJSON = JSON.stringify(locations);
       } else {
         info.el.title = "";
         info.el.removeAttribute("title");
+        // Use vibrant dot color instead of faded bg color on mobile
+        info.el.style.backgroundColor = info.event.borderColor;
       }
     },
   });
@@ -353,7 +355,8 @@ const locationsJSON = JSON.stringify(locations);
 
   // Auto-select today's date on load
   (() => {
-    const dateToSelect = (todayStr >= validStart && todayStr < validEnd) ? todayStr : validStart;
+    const dateToSelect =
+      todayStr >= validStart && todayStr < validEnd ? todayStr : validStart;
     showDayEvents(dateToSelect);
     const todayCell = calendarEl.querySelector(`[data-date="${dateToSelect}"]`);
     if (todayCell) todayCell.classList.add("fc-day-selected");
@@ -370,7 +373,6 @@ const locationsJSON = JSON.stringify(locations);
   // Tom Select for calendar location dropdown
   if (calLocationSelect) {
     new TomSelect(calLocationSelect, {
-      controlInput: undefined,
       allowEmptyOption: true,
       render: {
         option: function (data: any, escape: (s: string) => string) {
@@ -694,8 +696,9 @@ const locationsJSON = JSON.stringify(locations);
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: var(--space-md);
-
+    /* padding: var(--space-md); */
+    padding-top: 10px;
+    overflow: hidden;
     min-width: 0;
   }
 
@@ -703,7 +706,7 @@ const locationsJSON = JSON.stringify(locations);
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: var(--space-md);
+    padding: var(--space-sm);
     display: flex;
     flex-direction: column;
     min-height: 300px;

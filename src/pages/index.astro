@@ -30,6 +30,11 @@ import { courses } from "../data/courses";
           {courses.map((course) => <CourseCard course={course} />)}
         </div>
 
+        <button class="load-more-btn" id="load-more-btn" style="display:none">
+          <span class="material-symbols-outlined">expand_more</span>
+          <span id="load-more-text">Carregar mais</span>
+        </button>
+
         <div class="no-results" id="no-results" hidden>
           <div class="no-results-icon">
             <span class="material-symbols-outlined">search_off</span>
@@ -152,25 +157,101 @@ import { courses } from "../data/courses";
   const cards = document.querySelectorAll<HTMLElement>(".course-card");
   const noResults = document.getElementById("no-results")!;
   const counterNumber = document.getElementById("counter-number")!;
+  const searchInput = document.getElementById(
+    "search-input",
+  ) as HTMLInputElement;
 
   let activeArea = "all";
   let activeLocation = "all";
+  let searchQuery = "";
+
+  // --- Load-more on mobile ---
+  const INITIAL_SHOW = 15;
+  const LOAD_MORE_STEP = 30;
+  const loadMoreBtn = document.getElementById(
+    "load-more-btn",
+  ) as HTMLButtonElement;
+  const loadMoreText = document.getElementById("load-more-text")!;
+  let mobileLimit = INITIAL_SHOW;
+
+  function isMobile() {
+    return window.innerWidth < 768;
+  }
+
+  function hasActiveFilters() {
+    return (
+      activeArea !== "all" || activeLocation !== "all" || searchQuery !== ""
+    );
+  }
+
+  function showLoadMore(show: boolean) {
+    loadMoreBtn.style.display = show ? "" : "none";
+  }
+
+  function applyLoadMore() {
+    if (hasActiveFilters()) {
+      // Filtered: show all filtered, hide button
+      showLoadMore(false);
+      cards.forEach((card) => {
+        if (card.dataset._filtered === "true") card.style.display = "";
+      });
+      return;
+    }
+
+    // Get filtered (visible) cards in DOM order
+    const filtered: HTMLElement[] = [];
+    cards.forEach((card) => {
+      if (card.dataset._filtered === "true") filtered.push(card);
+    });
+
+    filtered.forEach((card, i) => {
+      card.style.display = i < mobileLimit ? "" : "none";
+    });
+
+    const remaining = filtered.length - mobileLimit;
+    if (remaining > 0) {
+      showLoadMore(true);
+      loadMoreText.textContent = `Carregar mais (${remaining})`;
+    } else {
+      showLoadMore(false);
+    }
+  }
+
+  loadMoreBtn.addEventListener("click", () => {
+    mobileLimit += LOAD_MORE_STEP;
+    applyLoadMore();
+  });
+
+  window.addEventListener("resize", () => applyLoadMore());
 
   function applyFilters() {
     let visibleCount = 0;
+    const query = searchQuery
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
     cards.forEach((card) => {
       const cardArea = card.dataset.area || "";
       const cardLocation = card.dataset.location || "";
+      const cardName = (card.dataset.name || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
       const matchArea = activeArea === "all" || cardArea === activeArea;
       const matchLocation =
         activeLocation === "all" || cardLocation === activeLocation;
-      const visible = matchArea && matchLocation;
+      const matchSearch = !query || cardName.includes(query);
+      const visible = matchArea && matchLocation && matchSearch;
+      // Mark filtered state, but don't set display yet (load-more handles it on mobile)
+      card.dataset._filtered = visible ? "true" : "false";
       card.style.display = visible ? "" : "none";
       if (visible) visibleCount++;
     });
+    // Reset mobile limit on filter change
+    mobileLimit = INITIAL_SHOW;
     counterNumber.textContent = String(visibleCount);
     noResults.hidden = visibleCount > 0;
     courseGrid.style.display = visibleCount > 0 ? "" : "none";
+    applyLoadMore();
   }
 
   areaChips.forEach((chip) => {
@@ -192,6 +273,12 @@ import { courses } from "../data/courses";
     applyFilters();
   });
 
+  // Listen for search input
+  searchInput.addEventListener("input", () => {
+    searchQuery = searchInput.value.trim();
+    applyFilters();
+  });
+
   // Initialize count
   applyFilters();
 </script>
@@ -201,6 +288,35 @@ import { courses } from "../data/courses";
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-md);
+  }
+
+  .load-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: var(--space-md);
+    padding: 12px 20px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .load-more-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .load-more-btn .material-symbols-outlined {
+    font-size: 20px;
   }
 
   @media (min-width: 640px) {

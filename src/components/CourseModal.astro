@@ -2,7 +2,7 @@
 /**
  * CourseModal — overlay modal for course details + share
  * Rendered once in the page; populated via JS when a card is clicked.
- * Deep-linkable through #curso-{id} in the URL.
+ * Deep-linkable through #curso-{slug} in the URL.
  */
 import { courses, AREA_COLORS, AREA_ICONS, JOTFORM_IDS } from "../data/courses";
 
@@ -98,9 +98,18 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
       : `https://www.google.com/maps/search/${encodeURIComponent(loc + ", Belo Horizonte, MG")}`;
   }
 
-  function getShareUrl(courseId: number): string {
+  function slugify(text: string): string {
+    return text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function getShareUrl(course: any): string {
     const url = new URL(window.location.href);
-    url.hash = `curso-${courseId}`;
+    url.hash = `curso-${slugify(course.name)}`;
     return url.toString();
   }
 
@@ -217,7 +226,7 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     const icon = areaIcons[course.area] || "auto_awesome";
     const enrollUrl = getEnrollUrl(course);
     const mapsUrl = getMapsUrl(course.location);
-    const shareUrl = getShareUrl(course.id);
+    const shareUrl = getShareUrl(course);
 
     let dateHTML = "";
     if (course.startDate && course.endDate) {
@@ -320,7 +329,7 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     backdrop.setAttribute("aria-hidden", "false");
     backdrop.classList.add("open");
     document.body.style.overflow = "hidden";
-    history.replaceState(null, "", `#curso-${courseId}`);
+    history.replaceState(null, "", `#curso-${slugify(course.name)}`);
   }
 
   function closeModal() {
@@ -363,13 +372,17 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     }
   });
 
-  // --- Deep link: open modal if URL has #curso-{id} ---
+  // --- Deep link: open modal if URL has #curso-{slug} ---
   function checkHash() {
-    const match = window.location.hash.match(/^#curso-(\d+)$/);
+    const match = window.location.hash.match(/^#curso-(.+)$/);
     if (match) {
-      const id = Number(match[1]);
-      // Small delay to ensure page is ready
-      requestAnimationFrame(() => openModal(id));
+      const hashSlug = match[1];
+      // Try slug match first, fall back to legacy numeric ID
+      const course = allCourses.find((c: any) => slugify(c.name) === hashSlug)
+        || (/^\d+$/.test(hashSlug) ? allCourses.find((c: any) => c.id === Number(hashSlug)) : null);
+      if (course) {
+        requestAnimationFrame(() => openModal(course.id));
+      }
     }
   }
   checkHash();
@@ -409,9 +422,9 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     box-shadow: var(--shadow-lg);
     max-width: 520px;
     width: 100%;
-    max-height: 90vh;
+    max-height: 98vh;
     overflow-y: auto;
-    padding: var(--space-lg);
+    padding: var(--space-md);
     transform: translateY(16px) scale(0.97);
     transition: transform 200ms ease;
   }
@@ -476,8 +489,8 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 20px;
-    padding: 16px;
+    margin-bottom: 8px;
+    padding: 8px;
     background: var(--bg-elevated);
     border-radius: var(--radius-md);
   }
@@ -528,8 +541,8 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
   /* Action buttons */
   .modal-actions {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: space-between;
   }
 
   .modal-btn {
@@ -650,7 +663,12 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     scroll-snap-align: start;
     background: var(--bg-elevated);
     border-radius: var(--radius-md);
-    padding: 10px;
+    padding: 4px;
+  }
+  @media (max-width: 720px) {
+    .fc-daygrid-day-bottom {
+      pointer-events: none;
+    }
   }
 
   .mini-cal-header {

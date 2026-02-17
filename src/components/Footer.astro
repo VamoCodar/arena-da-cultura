@@ -89,6 +89,12 @@
       <p>
         Dados extraídos do formulário oficial de inscrições — 1° Semestre/2026
       </p>
+      <p class="footer-credit">
+        Feito com <span class="heart">❤</span> por
+        <a href="https://github.com/VamoCodar" target="_blank" rel="noopener"
+          >VamoCodar</a
+        > — Vinicius P
+      </p>
     </div>
   </div>
 </footer>
@@ -180,6 +186,25 @@
     font-size: 0.75rem;
     color: #666;
     text-align: start;
+  }
+
+  .footer-credit {
+    margin-top: var(--space-sm);
+  }
+
+  .footer-credit .heart {
+    color: #e25555;
+  }
+
+  .footer-credit a {
+    color: #aaa;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color var(--transition-fast);
+  }
+
+  .footer-credit a:hover {
+    color: white;
   }
 
   @media (min-width: 768px) {
