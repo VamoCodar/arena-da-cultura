@@ -1,0 +1,19 @@
+---
+/**
+ * AreaBadge — colored pill showing the course area with its icon.
+ */
+import { AREA_COLORS, AREA_ICONS } from "../data/courses";
+
+interface Props {
+  area: string;
+}
+
+const { area } = Astro.props;
+const colors = AREA_COLORS[area] || AREA_COLORS["Artes Visuais"];
+const icon = AREA_ICONS[area] || "auto_awesome";
+---
+
+<span class="badge" style={`background:${colors.bg}; color:${colors.text}`}>
+  <span class="badge-icon material-symbols-outlined">{icon}</span>
+  {area}
+</span>

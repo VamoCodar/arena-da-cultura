@@ -1,16 +1,18 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
-import Hero from '../components/Hero.astro';
-import CourseFilters from '../components/CourseFilters.astro';
-import CourseCard from '../components/CourseCard.astro';
-import Calendar from '../components/Calendar.astro';
-import Footer from '../components/Footer.astro';
-import { courses } from '../data/courses';
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import CourseFilters from "../components/CourseFilters.astro";
+import CourseCard from "../components/CourseCard.astro";
+import Calendar from "../components/Calendar.astro";
+import CourseModal from "../components/CourseModal.astro";
+import Footer from "../components/Footer.astro";
+import { courses } from "../data/courses";
 ---
 
 <Layout>
   <Header />
+  <CourseModal />
   <main>
     <Hero />
 
@@ -18,20 +20,24 @@ import { courses } from '../data/courses';
     <section class="section" id="cursos">
       <div class="container">
         <h2 class="section-title">Cursos Disponíveis</h2>
-        <p class="section-subtitle">Explore os cursos gratuitos por área artística ou local</p>
+        <p class="section-subtitle">
+          Explore os cursos gratuitos por área artística ou local
+        </p>
 
         <CourseFilters />
 
         <div class="course-grid" id="course-grid">
-          {courses.map(course => (
-            <CourseCard course={course} />
-          ))}
+          {courses.map((course) => <CourseCard course={course} />)}
         </div>
 
         <div class="no-results" id="no-results" hidden>
-          <div class="no-results-icon">🔍</div>
+          <div class="no-results-icon">
+            <span class="material-symbols-outlined">search_off</span>
+          </div>
           <p class="no-results-text">Nenhum curso encontrado</p>
-          <p class="no-results-hint">Tente ajustar os filtros para ver mais resultados</p>
+          <p class="no-results-hint">
+            Tente ajustar os filtros para ver mais resultados
+          </p>
         </div>
       </div>
     </section>
@@ -40,7 +46,10 @@ import { courses } from '../data/courses';
     <section class="section" id="agenda">
       <div class="container">
         <h2 class="section-title">Agenda</h2>
-        <p class="section-subtitle">Visualize os cursos no calendário — clique em um dia para ver os detalhes</p>
+        <p class="section-subtitle">
+          Visualize os cursos no calendário — clique em um dia para ver os
+          detalhes
+        </p>
 
         <Calendar />
       </div>
@@ -53,30 +62,70 @@ import { courses } from '../data/courses';
           <h2 class="section-title">Sobre este site</h2>
           <div class="about-text">
             <p>
-              Este site foi criado como uma ferramenta independente para facilitar a consulta
-              dos cursos oferecidos pela <strong>Escola Livre de Artes Arena da Cultura</strong>,
-              um projeto da Prefeitura de Belo Horizonte em parceria com a Fundação de Educação,
-              Artes e Cultura.
+              Este site foi criado como uma ferramenta independente para
+              facilitar a consulta dos cursos oferecidos pela <strong
+                >Escola Livre de Artes Arena da Cultura</strong
+              >, um projeto da Prefeitura de Belo Horizonte em parceria com a
+              Fundação de Educação, Artes e Cultura.
             </p>
             <p>
-              Todos os cursos são <strong>gratuitos</strong> e acontecem em centros culturais
-              espalhados pela cidade, além de atividades online pela plataforma EAD da PBH.
+              Todos os cursos são <strong>gratuitos</strong> e acontecem em centros
+              culturais espalhados pela cidade, além de atividades online pela plataforma
+              EAD da PBH.
             </p>
 
             <div class="about-alert">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><circle cx="12" cy="12" r="10"></circle><line
+                  x1="12"
+                  y1="8"
+                  x2="12"
+                  y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"
+                ></line></svg
+              >
               <div>
-                <strong>Importante:</strong> Este site não possui vínculo oficial com a Prefeitura de
-                Belo Horizonte. Para informações oficiais e inscrições, utilize os canais oficiais.
+                <strong>Importante:</strong> Este site não possui vínculo oficial
+                com a Prefeitura de Belo Horizonte. Para informações oficiais e inscrições,
+                utilize os canais oficiais.
               </div>
             </div>
 
             <div class="about-actions">
-              <a href="https://form.jotform.com/260393432980662" target="_blank" rel="noopener" class="btn btn-primary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <a
+                href="https://form.jotform.com/260393432980662"
+                target="_blank"
+                rel="noopener"
+                class="btn btn-primary">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  ><path
+                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                  ></path><path
+                    d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                  ></path></svg
+                >
                 Formulário de Inscrição
               </a>
-              <a href="https://prefeitura.pbh.gov.br/fundacao-municipal-de-cultura/escola-livre-de-artes" target="_blank" rel="noopener" class="btn btn-outline">
+              <a
+                href="https://prefeitura.pbh.gov.br/fundacao-municipal-de-cultura/escola-livre-de-artes"
+                target="_blank"
+                rel="noopener"
+                class="btn btn-outline">
                 Site Oficial
               </a>
             </div>
@@ -89,63 +138,56 @@ import { courses } from '../data/courses';
   <Footer />
 </Layout>
 
-<!-- Inline client scripts for filters and card expand -->
+<!-- Inline client scripts for filters -->
 <script>
-  // =========================
-  // Card expand/collapse
-  // =========================
-  document.querySelectorAll('.card-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const card = btn.closest('.course-card');
-      if (!card) return;
-      const expanded = card.classList.toggle('expanded');
-      btn.setAttribute('aria-expanded', String(expanded));
-    });
-  });
-
   // =========================
   // Filters
   // =========================
-  const areaChips = document.querySelectorAll<HTMLButtonElement>('#area-chips .chip');
-  const locationFilter = document.getElementById('location-filter') as HTMLSelectElement;
-  const courseGrid = document.getElementById('course-grid')!;
-  const cards = document.querySelectorAll<HTMLElement>('.course-card');
-  const noResults = document.getElementById('no-results')!;
-  const counterNumber = document.getElementById('counter-number')!;
+  const areaChips =
+    document.querySelectorAll<HTMLButtonElement>("#area-chips .chip");
+  const locationFilter = document.getElementById(
+    "location-filter",
+  ) as HTMLSelectElement;
+  const courseGrid = document.getElementById("course-grid")!;
+  const cards = document.querySelectorAll<HTMLElement>(".course-card");
+  const noResults = document.getElementById("no-results")!;
+  const counterNumber = document.getElementById("counter-number")!;
 
-  let activeArea = 'all';
-  let activeLocation = 'all';
+  let activeArea = "all";
+  let activeLocation = "all";
 
   function applyFilters() {
     let visibleCount = 0;
-    cards.forEach(card => {
-      const cardArea = card.dataset.area || '';
-      const cardLocation = card.dataset.location || '';
-      const matchArea = activeArea === 'all' || cardArea === activeArea;
-      const matchLocation = activeLocation === 'all' || cardLocation === activeLocation;
+    cards.forEach((card) => {
+      const cardArea = card.dataset.area || "";
+      const cardLocation = card.dataset.location || "";
+      const matchArea = activeArea === "all" || cardArea === activeArea;
+      const matchLocation =
+        activeLocation === "all" || cardLocation === activeLocation;
       const visible = matchArea && matchLocation;
-      card.style.display = visible ? '' : 'none';
+      card.style.display = visible ? "" : "none";
       if (visible) visibleCount++;
     });
     counterNumber.textContent = String(visibleCount);
     noResults.hidden = visibleCount > 0;
-    courseGrid.style.display = visibleCount > 0 ? '' : 'none';
+    courseGrid.style.display = visibleCount > 0 ? "" : "none";
   }
 
-  areaChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      areaChips.forEach(c => {
-        c.classList.remove('active');
-        c.setAttribute('aria-checked', 'false');
+  areaChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      areaChips.forEach((c) => {
+        c.classList.remove("active");
+        c.setAttribute("aria-checked", "false");
       });
-      chip.classList.add('active');
-      chip.setAttribute('aria-checked', 'true');
-      activeArea = chip.dataset.area || 'all';
+      chip.classList.add("active");
+      chip.setAttribute("aria-checked", "true");
+      activeArea = chip.dataset.area || "all";
       applyFilters();
     });
   });
 
-  locationFilter.addEventListener('change', () => {
+  // Listen for change on the underlying select (Tom Select triggers this)
+  locationFilter.addEventListener("change", () => {
     activeLocation = locationFilter.value;
     applyFilters();
   });
@@ -201,22 +243,22 @@ import { courses } from '../data/courses';
     display: flex;
     gap: var(--space-sm);
     padding: var(--space-md);
-    background: #FFF8E1;
-    border: 1px solid #FFE082;
+    background: #fff8e1;
+    border: 1px solid #ffe082;
     border-radius: var(--radius-md);
     font-size: 0.875rem;
-    color: #5D4037;
+    color: #5d4037;
     line-height: 1.6;
   }
 
   .about-alert svg {
     flex-shrink: 0;
     margin-top: 2px;
-    color: #F57F17;
+    color: #f57f17;
   }
 
   .about-alert strong {
-    color: #E65100;
+    color: #e65100;
   }
 
   .about-actions {

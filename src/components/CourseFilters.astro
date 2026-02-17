@@ -1,33 +1,53 @@
 ---
-import { areas, locations } from '../data/courses';
+import { areas, locations, AREA_COLORS, AREA_ICONS } from "../data/courses";
 ---
 
 <div class="filters-wrapper">
-  <!-- Area filter chips (horizontal scrollable) -->
+  <!-- Area filter chips (wrapping) -->
   <div class="filter-group">
-    <div class="filter-chips" id="area-chips" role="radiogroup" aria-label="Filtrar por área">
-      <button class="chip active" data-area="all" role="radio" aria-checked="true">
+    <div
+      class="filter-chips"
+      id="area-chips"
+      role="radiogroup"
+      aria-label="Filtrar por área">
+      <button
+        class="chip active"
+        data-area="all"
+        role="radio"
+        aria-checked="true">
         Todas as Áreas
       </button>
-      {areas.map(area => (
-        <button class="chip" data-area={area} role="radio" aria-checked="false">
-          {area}
-        </button>
-      ))}
+      {
+        areas.map((area) => {
+          const c = AREA_COLORS[area] || AREA_COLORS["Artes Visuais"];
+          const icon = AREA_ICONS[area] || "auto_awesome";
+          return (
+            <button
+              class="chip"
+              data-area={area}
+              role="radio"
+              aria-checked="false"
+              style={`--chip-bg:${c.bg};--chip-text:${c.text};--chip-dot:${c.dot}`}>
+              <span class="chip-icon material-symbols-outlined">{icon}</span>{" "}
+              {area}
+            </button>
+          );
+        })
+      }
     </div>
   </div>
 
-  <!-- Location dropdown + counter -->
+  <!-- Location dropdown (Tom Select) + counter -->
   <div class="filter-row">
     <div class="filter-select-wrapper">
-      <svg class="filter-select-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      <select id="location-filter" class="filter-select" aria-label="Filtrar por local">
+      <select
+        id="location-filter"
+        class="filter-select"
+        aria-label="Filtrar por local"
+        placeholder="Todos os Locais">
         <option value="all">Todos os Locais</option>
-        {locations.map(loc => (
-          <option value={loc}>{loc}</option>
-        ))}
+        {locations.map((loc) => <option value={loc}>{loc}</option>)}
       </select>
-      <svg class="filter-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
 
     <div class="filter-counter" id="filter-counter" aria-live="polite">
@@ -35,6 +55,97 @@ import { areas, locations } from '../data/courses';
     </div>
   </div>
 </div>
+
+<script>
+  import TomSelect from 'tom-select';
+  import 'tom-select/dist/css/tom-select.default.css';
+
+  const selectEl = document.getElementById('location-filter') as HTMLSelectElement;
+  if (selectEl) {
+    new TomSelect(selectEl, {
+      controlInput: undefined,
+      allowEmptyOption: true,
+      render: {
+        option: function(data: any, escape: (s: string) => string) {
+          return `<div class="ts-option-item">
+            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;color:var(--text-muted)">location_on</span>
+            ${escape(data.text)}
+          </div>`;
+        },
+        item: function(data: any, escape: (s: string) => string) {
+          return `<div class="ts-item-inner">
+            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;color:var(--text-muted)">location_on</span>
+            ${escape(data.text)}
+          </div>`;
+        },
+      },
+    });
+  }
+</script>
+
+<style is:global>
+  /* Tom Select theme overrides */
+  .ts-wrapper {
+    font-family: var(--font-sans) !important;
+  }
+
+  .ts-wrapper.single .ts-control {
+    border: 1.5px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    background: white !important;
+    padding: 8px 36px 8px 12px !important;
+    font-size: 0.875rem !important;
+    color: var(--text-primary) !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    min-height: 0 !important;
+    line-height: 1.4 !important;
+    transition: border-color var(--transition-fast) !important;
+  }
+
+  .ts-wrapper.single .ts-control:hover,
+  .ts-wrapper.single.focus .ts-control {
+    border-color: var(--accent) !important;
+  }
+
+  .ts-wrapper.single .ts-control::after {
+    border-color: var(--text-muted) transparent transparent transparent !important;
+    border-width: 5px 5px 0 !important;
+    margin-top: -3px !important;
+  }
+
+  .ts-wrapper.single.focus .ts-control::after {
+    border-color: var(--accent) transparent transparent transparent !important;
+  }
+
+  .ts-dropdown {
+    border: 1.5px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
+    background: white !important;
+    margin-top: 4px !important;
+    z-index: 50 !important;
+  }
+
+  .ts-dropdown .option {
+    padding: 8px 12px !important;
+    font-size: 0.85rem !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer !important;
+    transition: all 100ms ease !important;
+  }
+
+  .ts-dropdown .option:hover,
+  .ts-dropdown .option.active {
+    background: var(--accent-light) !important;
+    color: var(--accent) !important;
+  }
+
+  .ts-dropdown .option.selected {
+    background: var(--accent) !important;
+    color: white !important;
+  }
+</style>
 
 <style>
   .filters-wrapper {
@@ -45,50 +156,67 @@ import { areas, locations } from '../data/courses';
   }
 
   .filter-group {
-    overflow: hidden;
-    margin: 0 calc(-1 * var(--space-md));
-    padding: 0 var(--space-md);
+    /* No overflow hidden — allow wrapping */
   }
 
   .filter-chips {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 4px;
-  }
-
-  .filter-chips::-webkit-scrollbar {
-    display: none;
   }
 
   .chip {
-    scroll-snap-align: start;
     display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 8px 16px;
-    border: 1.5px solid var(--border);
+    border: 1.5px solid var(--chip-dot, var(--border));
     border-radius: var(--radius-full);
     background: white;
     font-family: var(--font-sans);
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: var(--chip-text, var(--text-secondary));
     cursor: pointer;
     white-space: nowrap;
     transition: all var(--transition-fast);
-    flex-shrink: 0;
+  }
+
+  .chip .chip-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .chip .chip-icon.material-symbols-outlined {
+    font-size: 16px;
+    vertical-align: -2px;
   }
 
   .chip:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    background: var(--chip-bg, var(--accent-light));
+    border-color: var(--chip-dot, var(--accent));
+    color: var(--chip-text, var(--accent));
   }
 
   .chip.active {
+    background: var(--chip-text, var(--accent));
+    border-color: var(--chip-text, var(--accent));
+    color: white;
+  }
+
+  .chip[data-area="all"] {
+    --chip-dot: var(--border);
+    --chip-text: var(--text-secondary);
+    --chip-bg: var(--accent-light);
+  }
+
+  .chip[data-area="all"]:hover {
+    --chip-dot: var(--accent);
+    --chip-text: var(--accent);
+  }
+
+  .chip[data-area="all"].active {
+    --chip-text: var(--accent);
     background: var(--accent);
     border-color: var(--accent);
     color: white;
@@ -102,47 +230,8 @@ import { areas, locations } from '../data/courses';
   }
 
   .filter-select-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
     flex: 1;
     max-width: 320px;
-  }
-
-  .filter-select-icon {
-    position: absolute;
-    left: 12px;
-    color: var(--text-muted);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .filter-select {
-    width: 100%;
-    padding: 10px 36px 10px 36px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-md);
-    background: white;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    transition: border-color var(--transition-fast);
-  }
-
-  .filter-select:hover,
-  .filter-select:focus {
-    border-color: var(--accent);
-    outline: none;
-  }
-
-  .filter-select-chevron {
-    position: absolute;
-    right: 12px;
-    color: var(--text-muted);
-    pointer-events: none;
   }
 
   .filter-counter {
@@ -156,12 +245,5 @@ import { areas, locations } from '../data/courses';
   #counter-number {
     color: var(--accent);
     font-size: 1.1rem;
-  }
-
-  @media (min-width: 768px) {
-    .filter-group {
-      margin: 0;
-      padding: 0;
-    }
   }
 </style>

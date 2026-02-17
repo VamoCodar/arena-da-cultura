@@ -1,101 +1,144 @@
 ---
-import type { Course } from '../data/courses';
-import { AREA_COLORS, AREA_ICONS } from '../data/courses';
+import type { Course } from "../data/courses";
+import { JOTFORM_IDS } from "../data/courses";
+import AreaBadge from "./AreaBadge.astro";
+import AgeBadge from "./AgeBadge.astro";
 
 interface Props {
   course: Course;
 }
 
 const { course } = Astro.props;
-const colors = AREA_COLORS[course.area] || AREA_COLORS["Artes Visuais"];
-const icon = AREA_ICONS[course.area] || "✨";
 
 const formatDateRange = (start: string | null, end: string | null) => {
   if (!start || !end) return null;
   const fmt = (d: string) => {
     const date = new Date(d + "T12:00:00");
-    return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+    return date
+      .toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })
+      .replace(/\.$/, "");
   };
   return `${fmt(start)} — ${fmt(end)}`;
 };
 
 const dateRange = formatDateRange(course.startDate, course.endDate);
-const isOnline = course.location.includes("Online") || course.location.includes("EAD");
+const isOnline =
+  course.location.includes("Online") || course.location.includes("EAD");
+
+const mapsUrl = isOnline
+  ? null
+  : `https://www.google.com/maps/search/${encodeURIComponent(course.location + ", Belo Horizonte, MG")}`;
+
+const jotformAnchor = JOTFORM_IDS[course.id];
+const enrollUrl = jotformAnchor
+  ? `${course.enrollmentUrl}#${jotformAnchor}`
+  : course.enrollmentUrl;
+
+const specificDatesFormatted =
+  course.specificDates.length > 0
+    ? course.specificDates
+        .map((d) => {
+          const date = new Date(d + "T12:00:00");
+          return date
+            .toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "short",
+            })
+            .replace(/\.$/, "");
+        })
+        .join(", ")
+    : null;
 ---
 
 <article
   class="course-card"
+  style="position: relative;"
   data-area={course.area}
   data-location={course.location}
-  data-course-id={course.id}
->
-  <div class="card-main">
-    <div class="card-top">
-      <span class="badge" style={`background:${colors.bg}; color:${colors.text}`}>
-        <span class="badge-icon">{icon}</span>
-        {course.area}
-      </span>
-      {isOnline && (
-        <span class="online-badge">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          Online
-        </span>
-      )}
+  data-course-id={course.id}>
+  <!-- Header: badge + enroll button -->
+  <div class="card-header">
+    <div class="card-badges">
+      <AreaBadge area={course.area} />
+      {
+        isOnline && (
+          <span class="online-badge">
+            <span class="material-symbols-outlined" style="font-size:12px">
+              language
+            </span>
+            Online
+          </span>
+        )
+      }
     </div>
-
-    <h3 class="card-title">{course.name}</h3>
-
-    <div class="card-info">
-      <div class="card-info-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>{course.location}</span>
-      </div>
-
-      <div class="card-info-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>{course.schedule}</span>
-      </div>
-
-      <div class="card-info-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-        <span>{course.ageRange}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Expandable details -->
-  <div class="card-details">
-    {dateRange && (
-      <div class="card-detail-row">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span><strong>Período:</strong> {dateRange}</span>
-      </div>
-    )}
-    {course.specificDates.length > 0 && (
-      <div class="card-detail-row">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span><strong>Data(s):</strong> {course.specificDates.map(d => {
-          const date = new Date(d + "T12:00:00");
-          return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
-        }).join(", ")}</span>
-      </div>
-    )}
+    <!--     style={`background:${colors.text}`} -->
     <a
-      href={course.enrollmentUrl}
+      href={enrollUrl}
       target="_blank"
       rel="noopener"
-      class="btn btn-primary btn-sm card-enroll"
-      style={`background:${colors.text}`}
-    >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      Inscrever-se
+      class="card-enroll-btn tooltip"
+      data-tooltip="Inscrever-se"
+      aria-label={`Inscrever-se em ${course.name}`}>
+      <span class="material-symbols-outlined">open_in_new</span>
     </a>
   </div>
 
-  <!-- Expand toggle -->
-  <button class="card-toggle" aria-expanded="false" aria-label="Ver detalhes">
-    <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-  </button>
+  <!-- Title -->
+  <h3 class="card-title">{course.name}</h3>
+
+  <!-- Info rows -->
+  <div class="card-info">
+    {
+      dateRange && (
+        <div class="card-info-item card-info-period">
+          <span class="material-symbols-outlined card-info-icon">
+            date_range
+          </span>
+          <span>{dateRange}</span>
+        </div>
+      )
+    }
+    {
+      specificDatesFormatted && (
+        <div class="card-info-item card-info-period">
+          <span class="material-symbols-outlined card-info-icon">event</span>
+          <span>{specificDatesFormatted}</span>
+        </div>
+      )
+    }
+    <div class="card-info-item">
+      <span class="material-symbols-outlined card-info-icon">schedule</span>
+      <span>{course.schedule}</span>
+    </div>
+    <div class="card-info-item">
+      <span class="material-symbols-outlined card-info-icon">location_on</span>
+      {
+        mapsUrl ? (
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener"
+            class="card-location-link">
+            {course.location}
+            <span
+              class="material-symbols-outlined"
+              style="font-size:12px;vertical-align:-1px;margin-left:2px">
+              open_in_new
+            </span>
+          </a>
+        ) : (
+          <span>{course.location}</span>
+        )
+      }
+    </div>
+  </div>
+
+  <!-- Age badge -->
+  <div
+    class="card-footer"
+    style="margin-left: auto; position: absolute; bottom: 12px; right: 12px;">
+    <AgeBadge ageRange={course.ageRange} />
+  </div>
 </article>
 
 <style>
@@ -105,8 +148,10 @@ const isOnline = course.location.includes("Online") || course.location.includes(
     border-radius: var(--radius-lg);
     padding: var(--space-md);
     transition: all var(--transition-base);
-    position: relative;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    cursor: pointer;
   }
 
   .course-card:hover {
@@ -115,33 +160,53 @@ const isOnline = course.location.includes("Online") || course.location.includes(
     transform: translateY(-2px);
   }
 
-  .card-main {
+  .card-header {
     display: flex;
-    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
     gap: var(--space-sm);
   }
 
-  .card-top {
+  .card-badges {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
     flex-wrap: wrap;
   }
 
-  .badge-icon {
-    font-size: 0.85rem;
-  }
-
   .online-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     padding: 2px 8px;
     border-radius: var(--radius-full);
     font-size: 0.7rem;
     font-weight: 600;
-    background: #E3F2FD;
-    color: #1565C0;
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+
+  .card-enroll-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    /* background: rgba(0, 0, 0, 0.05); */
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .card-enroll-btn .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  .card-enroll-btn:hover {
+    filter: brightness(0.85);
+    transform: scale(1.08);
   }
 
   .card-title {
@@ -150,98 +215,80 @@ const isOnline = course.location.includes("Online") || course.location.includes(
     font-size: 0.975rem;
     line-height: 1.35;
     color: var(--text-primary);
-    padding-right: var(--space-xl);
+    min-height: 43px;
   }
 
   .card-info {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
   }
 
   .card-info-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-size: 0.8125rem;
     color: var(--text-secondary);
   }
 
-  .card-info-item svg {
-    flex-shrink: 0;
+  .card-info-icon {
+    font-size: 16px;
     color: var(--text-muted);
+    flex-shrink: 0;
   }
 
-  /* Expandable details */
-  .card-details {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height var(--transition-slow), padding var(--transition-slow), opacity var(--transition-base);
-    opacity: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
+  .card-info-period {
+    font-weight: 500;
+    color: var(--text-primary);
   }
 
-  .course-card.expanded .card-details {
-    max-height: 200px;
-    opacity: 1;
-    padding-top: var(--space-md);
-    margin-top: var(--space-sm);
-    border-top: 1px solid var(--border);
-  }
-
-  .card-detail-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.8125rem;
+  .card-location-link {
     color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
   }
 
-  .card-detail-row svg {
-    flex-shrink: 0;
-    color: var(--text-muted);
-  }
-
-  .card-enroll {
-    align-self: flex-start;
-    margin-top: var(--space-xs);
-  }
-
-  .card-enroll:hover {
-    filter: brightness(0.85);
-  }
-
-  /* Toggle button */
-  .card-toggle {
-    position: absolute;
-    top: var(--space-md);
-    right: var(--space-md);
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--bg);
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-  }
-
-  .card-toggle:hover {
-    border-color: var(--accent);
+  .card-location-link:hover {
     color: var(--accent);
-    background: var(--accent-light);
+    text-decoration: underline;
   }
 
-  .toggle-icon {
-    transition: transform var(--transition-base);
+  .card-footer {
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+    padding-top: var(--space-xs);
   }
 
-  .course-card.expanded .toggle-icon {
-    transform: rotate(180deg);
+  /* Tooltip */
+  .tooltip {
+    position: relative;
+  }
+
+  .tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.92);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--text-primary);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity 150ms ease,
+      transform 150ms ease;
+  }
+
+  .tooltip:hover::after,
+  .tooltip:focus-visible::after {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
   }
 </style>

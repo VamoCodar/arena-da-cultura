@@ -1,5 +1,11 @@
 ---
-import { courses, AREA_COLORS, AREA_ICONS } from '../data/courses';
+import {
+  courses,
+  areas,
+  locations,
+  AREA_COLORS,
+  AREA_ICONS,
+} from "../data/courses";
 
 // Build FullCalendar events array at build time
 type FCEvent = {
@@ -25,7 +31,12 @@ const fcEvents: FCEvent[] = [];
 for (const course of courses) {
   const colors = AREA_COLORS[course.area] || AREA_COLORS["Artes Visuais"];
 
-  if (course.isRecurring && course.startDate && course.endDate && course.daysOfWeek.length > 0) {
+  if (
+    course.isRecurring &&
+    course.startDate &&
+    course.endDate &&
+    course.daysOfWeek.length > 0
+  ) {
     const start = new Date(course.startDate + "T12:00:00");
     const end = new Date(course.endDate + "T12:00:00");
     const current = new Date(start);
@@ -76,7 +87,53 @@ for (const course of courses) {
 const eventsJSON = JSON.stringify(fcEvents);
 const areaColorsJSON = JSON.stringify(AREA_COLORS);
 const areaIconsJSON = JSON.stringify(AREA_ICONS);
+const locationsJSON = JSON.stringify(locations);
 ---
+
+<!-- Calendar Filters -->
+<div class="cal-filters">
+  <div
+    class="cal-filter-chips"
+    id="cal-area-chips"
+    role="radiogroup"
+    aria-label="Filtrar agenda por área">
+    <button
+      class="cal-chip active"
+      data-area="all"
+      role="radio"
+      aria-checked="true">
+      Todas as Áreas
+    </button>
+    {
+      areas.map((area) => {
+        const c = AREA_COLORS[area] || AREA_COLORS["Artes Visuais"];
+        const icon = AREA_ICONS[area] || "auto_awesome";
+        return (
+          <button
+            class="cal-chip"
+            data-area={area}
+            role="radio"
+            aria-checked="false"
+            style={`--chip-bg:${c.bg};--chip-text:${c.text};--chip-dot:${c.dot}`}>
+            <span class="chip-icon material-symbols-outlined">{icon}</span>{" "}
+            {area}
+          </button>
+        );
+      })
+    }
+  </div>
+  <div class="cal-filter-row">
+    <div class="cal-select-wrapper">
+      <select
+        id="cal-location-filter"
+        class="cal-filter-select"
+        aria-label="Filtrar agenda por local">
+        <option value="all">Todos os Locais</option>
+        {locations.map((loc) => <option value={loc}>{loc}</option>)}
+      </select>
+    </div>
+  </div>
+</div>
 
 <div class="agenda-layout">
   <!-- Calendar side -->
@@ -91,130 +148,264 @@ const areaIconsJSON = JSON.stringify(AREA_ICONS);
       <span class="listing-count" id="listing-count"></span>
     </div>
     <div class="listing-placeholder" id="listing-placeholder">
-      <div class="listing-placeholder-icon">📅</div>
+      <div class="listing-placeholder-icon">
+        <span class="material-symbols-outlined">calendar_month</span>
+      </div>
       <p>Clique em um dia no calendário para ver os cursos desse dia</p>
     </div>
     <div class="listing-items" id="listing-items"></div>
   </div>
 </div>
 
-<script define:vars={{ eventsJSON, areaColorsJSON, areaIconsJSON }}>
+<script
+  define:vars={{ eventsJSON, areaColorsJSON, areaIconsJSON, locationsJSON }}
+>
   // Data is injected server-side
   window.__FC_EVENTS__ = eventsJSON;
   window.__AREA_COLORS__ = areaColorsJSON;
   window.__AREA_ICONS__ = areaIconsJSON;
+  window.__CAL_LOCATIONS__ = locationsJSON;
 </script>
 
 <script>
-  import { Calendar } from '@fullcalendar/core';
-  import dayGridPlugin from '@fullcalendar/daygrid';
-  import listPlugin from '@fullcalendar/list';
-  import interactionPlugin from '@fullcalendar/interaction';
+  import { Calendar } from "@fullcalendar/core";
+  import dayGridPlugin from "@fullcalendar/daygrid";
+  import listPlugin from "@fullcalendar/list";
+  import interactionPlugin from "@fullcalendar/interaction";
+  import TomSelect from "tom-select";
+  import "tom-select/dist/css/tom-select.default.css";
+  import { ageBadgeHTML, areaBadgeHTML } from "../utils/badges";
 
-  const events = JSON.parse((window as any).__FC_EVENTS__);
+  const allEvents = JSON.parse((window as any).__FC_EVENTS__);
   const areaColors = JSON.parse((window as any).__AREA_COLORS__);
   const areaIcons = JSON.parse((window as any).__AREA_ICONS__);
 
-  const calendarEl = document.getElementById('fullcalendar')!;
-  const listingDate = document.getElementById('listing-date')!;
-  const listingCount = document.getElementById('listing-count')!;
-  const listingPlaceholder = document.getElementById('listing-placeholder')!;
-  const listingItems = document.getElementById('listing-items')!;
+  const calendarEl = document.getElementById("fullcalendar")!;
+  const listingDate = document.getElementById("listing-date")!;
+  const listingCount = document.getElementById("listing-count")!;
+  const listingPlaceholder = document.getElementById("listing-placeholder")!;
+  const listingItems = document.getElementById("listing-items")!;
+
+  // --- Calendar filter state ---
+  let calActiveArea = "all";
+  let calActiveLocation = "all";
+  let selectedDateStr: string | null = null;
+
+  function getFilteredEvents() {
+    return allEvents.filter((e: any) => {
+      const matchArea =
+        calActiveArea === "all" || e.extendedProps.area === calActiveArea;
+      const matchLoc =
+        calActiveLocation === "all" ||
+        e.extendedProps.location === calActiveLocation;
+      return matchArea && matchLoc;
+    });
+  }
 
   function showDayEvents(dateStr: string) {
-    const dayEvents = events.filter((e: any) => e.start === dateStr);
-    const d = new Date(dateStr + 'T12:00:00');
-    const formatted = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-    listingDate.textContent = formatted.charAt(0).toUpperCase() + formatted.slice(1);
-    listingCount.textContent = dayEvents.length > 0 ? `${dayEvents.length} curso${dayEvents.length > 1 ? 's' : ''}` : '';
+    selectedDateStr = dateStr;
+    const filtered = getFilteredEvents();
+    const dayEvents = filtered.filter((e: any) => e.start === dateStr);
+    const d = new Date(dateStr + "T12:00:00");
+    const formatted = d.toLocaleDateString("pt-BR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+    listingDate.textContent =
+      formatted.charAt(0).toUpperCase() + formatted.slice(1);
+    listingCount.textContent =
+      dayEvents.length > 0
+        ? `${dayEvents.length} curso${dayEvents.length > 1 ? "s" : ""}`
+        : "";
 
     if (dayEvents.length === 0) {
-      listingPlaceholder.style.display = '';
-      listingPlaceholder.querySelector('p')!.textContent = 'Nenhum curso neste dia';
-      listingItems.innerHTML = '';
+      listingPlaceholder.style.display = "";
+      listingPlaceholder.querySelector("p")!.textContent =
+        "Nenhum curso neste dia";
+      listingItems.innerHTML = "";
       return;
     }
 
-    listingPlaceholder.style.display = 'none';
+    listingPlaceholder.style.display = "none";
 
     // Sort by area then time
     dayEvents.sort((a: any, b: any) => {
-      const areaCompare = a.extendedProps.area.localeCompare(b.extendedProps.area);
+      const areaCompare = a.extendedProps.area.localeCompare(
+        b.extendedProps.area,
+      );
       if (areaCompare !== 0) return areaCompare;
       return a.extendedProps.time.localeCompare(b.extendedProps.time);
     });
 
-    listingItems.innerHTML = dayEvents.map((e: any) => {
-      const c = areaColors[e.extendedProps.area] || areaColors['Artes Visuais'];
-      const icon = areaIcons[e.extendedProps.area] || '✨';
-      return `
-        <div class="listing-event" style="border-left: 3px solid ${c.dot}">
+    listingItems.innerHTML = dayEvents
+      .map((e: any) => {
+        const c =
+          areaColors[e.extendedProps.area] || areaColors["Artes Visuais"];
+        const icon = areaIcons[e.extendedProps.area] || "auto_awesome";
+        return `
+        <div class="listing-event" data-course-id="${e.extendedProps.courseId}">
           <div class="listing-event-top">
-            <span class="listing-event-badge" style="background:${c.bg};color:${c.text}">${icon} ${e.extendedProps.area}</span>
-            <span class="listing-event-time">${e.extendedProps.time}</span>
+            ${areaBadgeHTML(e.extendedProps.area, c, icon)}
+            <span class="listing-event-time"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-2px">schedule</span> ${e.extendedProps.time}</span>
           </div>
           <div class="listing-event-name">${e.title}</div>
           <div class="listing-event-meta">
-            <span class="listing-event-location">📍 ${e.extendedProps.location}</span>
-            <span class="listing-event-age">👤 ${e.extendedProps.ageRange}</span>
+            <span class="listing-event-location"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-2px">location_on</span> ${e.extendedProps.location}</span>
+            ${ageBadgeHTML(e.extendedProps.ageRange)}
           </div>
         </div>
       `;
-    }).join('');
+      })
+      .join("");
 
     // Scroll listing into view on mobile
     if (window.innerWidth < 768) {
-      listingItems.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      listingItems.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }
 
+  function applyCalendarFilters() {
+    const filtered = getFilteredEvents();
+    calendar.removeAllEventSources();
+    calendar.addEventSource(filtered);
+    // Refresh the day listing if a day was selected
+    if (selectedDateStr) {
+      showDayEvents(selectedDateStr);
+    }
+  }
+
+  // Determine initial date: use today if within valid range, otherwise range start
+  const validStart = "2026-02-01";
+  const validEnd = "2026-08-01";
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const initialDate = (todayStr >= validStart && todayStr < validEnd) ? todayStr : validStart;
+
   const calendar = new Calendar(calendarEl, {
     plugins: [dayGridPlugin, listPlugin, interactionPlugin],
-    initialView: 'dayGridMonth',
-    initialDate: '2026-03-01',
-    locale: 'pt-br',
+    initialView: "dayGridMonth",
+    initialDate,
+    locale: "pt-br",
     headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,listWeek',
+      left: "prev,next today",
+      center: "title",
+      right: "dayGridMonth,listWeek",
     },
     buttonText: {
-      today: 'Hoje',
-      month: 'Mês',
-      list: 'Lista',
+      today: "Hoje",
+      month: "Mês",
+      list: "Lista",
     },
     validRange: {
-      start: '2026-02-01',
-      end: '2026-08-01',
+      start: "2026-02-01",
+      end: "2026-08-01",
     },
-    events: events,
-    height: 'auto',
+    events: allEvents,
+    height: "auto",
     dayMaxEventRows: 3,
     moreLinkText: (n: number) => `+${n} mais`,
-    eventDisplay: 'block',
-    dateClick: function(info: any) {
+    eventDisplay: "block",
+    dateClick: function (info: any) {
       showDayEvents(info.dateStr);
       // Highlight selected day
-      document.querySelectorAll('.fc-day-selected').forEach(el => el.classList.remove('fc-day-selected'));
+      document
+        .querySelectorAll(".fc-day-selected")
+        .forEach((el) => el.classList.remove("fc-day-selected"));
       const dayEl = info.dayEl;
-      if (dayEl) dayEl.classList.add('fc-day-selected');
+      if (dayEl) dayEl.classList.add("fc-day-selected");
+      // On mobile, scroll directly to listing
+      if (window.innerWidth < 768) {
+        document
+          .getElementById("agenda-listing")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     },
-    eventClick: function(info: any) {
+    eventClick: function (info: any) {
       info.jsEvent.preventDefault();
       showDayEvents(info.event.startStr);
       // Highlight
-      document.querySelectorAll('.fc-day-selected').forEach(el => el.classList.remove('fc-day-selected'));
+      document
+        .querySelectorAll(".fc-day-selected")
+        .forEach((el) => el.classList.remove("fc-day-selected"));
       const dateStr = info.event.startStr;
       const dayCell = calendarEl.querySelector(`[data-date="${dateStr}"]`);
-      if (dayCell) dayCell.classList.add('fc-day-selected');
+      if (dayCell) dayCell.classList.add("fc-day-selected");
+      // On mobile, scroll directly to listing
+      if (window.innerWidth < 768) {
+        document
+          .getElementById("agenda-listing")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     },
-    eventDidMount: function(info: any) {
+    eventDidMount: function (info: any) {
       const props = info.event.extendedProps;
-      info.el.title = `${props.area} — ${info.event.title}\n${props.time} · ${props.location}`;
+      // Only show tooltip on desktop; mobile clicks go straight to listing
+      if (window.innerWidth >= 768) {
+        info.el.title = `${props.area} — ${info.event.title}\n${props.time} · ${props.location}`;
+      } else {
+        info.el.title = "";
+        info.el.removeAttribute("title");
+      }
     },
   });
 
   calendar.render();
+
+  // Auto-select today's date on load
+  (() => {
+    const dateToSelect = (todayStr >= validStart && todayStr < validEnd) ? todayStr : validStart;
+    showDayEvents(dateToSelect);
+    const todayCell = calendarEl.querySelector(`[data-date="${dateToSelect}"]`);
+    if (todayCell) todayCell.classList.add("fc-day-selected");
+  })();
+
+  // --- Calendar filter wiring ---
+  const calAreaChips = document.querySelectorAll<HTMLButtonElement>(
+    "#cal-area-chips .cal-chip",
+  );
+  const calLocationSelect = document.getElementById(
+    "cal-location-filter",
+  ) as HTMLSelectElement;
+
+  // Tom Select for calendar location dropdown
+  if (calLocationSelect) {
+    new TomSelect(calLocationSelect, {
+      controlInput: undefined,
+      allowEmptyOption: true,
+      render: {
+        option: function (data: any, escape: (s: string) => string) {
+          return `<div class="ts-option-item">
+            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;color:var(--text-muted)">location_on</span>
+            ${escape(data.text)}
+          </div>`;
+        },
+        item: function (data: any, escape: (s: string) => string) {
+          return `<div class="ts-item-inner">
+            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;color:var(--text-muted)">location_on</span>
+            ${escape(data.text)}
+          </div>`;
+        },
+      },
+    });
+  }
+
+  calAreaChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      calAreaChips.forEach((c) => {
+        c.classList.remove("active");
+        c.setAttribute("aria-checked", "false");
+      });
+      chip.classList.add("active");
+      chip.setAttribute("aria-checked", "true");
+      calActiveArea = chip.dataset.area || "all";
+      applyCalendarFilters();
+    });
+  });
+
+  calLocationSelect.addEventListener("change", () => {
+    calActiveLocation = calLocationSelect.value;
+    applyCalendarFilters();
+  });
 </script>
 
 <style is:global>
@@ -366,14 +557,133 @@ const areaIconsJSON = JSON.stringify(AREA_ICONS);
       min-height: 60px;
     }
 
+    /* Dot mode on mobile: hide text, show filled colored dot */
     .fc .fc-daygrid-event {
+      font-size: 0 !important;
+      padding: 0 !important;
+      width: 8px;
+      height: 8px;
+      border-radius: 50% !important;
+      display: inline-block !important;
+      margin: 1px 1px !important;
+      border-left-width: 0 !important;
+      min-height: 0 !important;
+      border: none !important;
+    }
+
+    .fc .fc-daygrid-event .fc-event-title,
+    .fc .fc-daygrid-event .fc-event-main-frame {
+      display: none !important;
+    }
+
+    .fc .fc-daygrid-event-harness {
+      display: inline-flex !important;
+      width: auto !important;
+      margin: 0 !important;
+    }
+
+    .fc .fc-daygrid-day-events {
+      display: flex !important;
+      flex-wrap: wrap;
+      gap: 2px;
+      justify-content: center;
+      padding: 2px !important;
+      min-height: 0 !important;
+    }
+
+    .fc .fc-daygrid-event-dot {
+      display: none !important;
+    }
+
+    .fc .fc-more-link {
       font-size: 0.6rem !important;
-      padding: 0 2px;
     }
   }
 </style>
 
 <style>
+  /* Calendar filters */
+  .cal-filters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .cal-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .cal-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    border: 1.5px solid var(--chip-dot, var(--border));
+    border-radius: var(--radius-full);
+    background: white;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--chip-text, var(--text-secondary));
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+  }
+
+  .cal-chip .chip-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .cal-chip .chip-icon.material-symbols-outlined {
+    font-size: 16px;
+    vertical-align: -2px;
+  }
+
+  .cal-chip:hover {
+    background: var(--chip-bg, var(--accent-light));
+    border-color: var(--chip-dot, var(--accent));
+    color: var(--chip-text, var(--accent));
+  }
+
+  .cal-chip.active {
+    background: var(--chip-text, var(--accent));
+    border-color: var(--chip-text, var(--accent));
+    color: white;
+  }
+
+  .cal-chip[data-area="all"] {
+    --chip-dot: var(--border);
+    --chip-text: var(--text-secondary);
+    --chip-bg: var(--accent-light);
+  }
+
+  .cal-chip[data-area="all"]:hover {
+    --chip-dot: var(--accent);
+    --chip-text: var(--accent);
+  }
+
+  .cal-chip[data-area="all"].active {
+    --chip-text: var(--accent);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .cal-filter-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .cal-select-wrapper {
+    flex: 1;
+    max-width: 320px;
+  }
+
   .agenda-layout {
     display: flex;
     flex-direction: column;
@@ -385,7 +695,7 @@ const areaIconsJSON = JSON.stringify(AREA_ICONS);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: var(--space-md);
-    overflow: hidden;
+
     min-width: 0;
   }
 
@@ -492,17 +802,24 @@ const areaIconsJSON = JSON.stringify(AREA_ICONS);
 </style>
 
 <style is:global>
-  /* Listing event items (injected via JS) */
+  /* Listing event items — card-like style */
   .listing-event {
-    padding: var(--space-sm) var(--space-md);
-    background: var(--bg-elevated);
-    border-radius: var(--radius-md);
-    transition: all 150ms ease;
+    position: relative;
+    padding: var(--space-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .listing-event:hover {
-    background: var(--bg-card);
-    box-shadow: var(--shadow-sm);
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
   }
 
   .listing-event-top {
@@ -510,40 +827,38 @@ const areaIconsJSON = JSON.stringify(AREA_ICONS);
     align-items: center;
     justify-content: space-between;
     gap: var(--space-sm);
-    margin-bottom: 4px;
-  }
-
-  .listing-event-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
-    font-size: 0.65rem;
-    font-weight: 600;
-    white-space: nowrap;
   }
 
   .listing-event-time {
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary);
     white-space: nowrap;
   }
 
   .listing-event-name {
+    font-family: var(--font-sans);
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-primary);
-    line-height: 1.3;
-    margin-bottom: 4px;
+    line-height: 1.35;
   }
 
   .listing-event-meta {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 0.725rem;
-    color: var(--text-muted);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .listing-event-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
   }
 </style>

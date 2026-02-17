@@ -1,0 +1,19 @@
+---
+/**
+ * AgeBadge — compact age-range indicator.
+ * Renders "Livre", "6–12", "18+", etc. from the full ageRange string.
+ */
+import { formatAgeBadge } from "../utils/badges";
+
+interface Props {
+  ageRange: string;
+}
+
+const { ageRange } = Astro.props;
+const label = formatAgeBadge(ageRange);
+---
+
+<span class="age-badge" title={ageRange}>
+  <span class="material-symbols-outlined age-badge-icon">face</span>
+  {label}
+</span>
