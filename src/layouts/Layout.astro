@@ -14,7 +14,7 @@ const {
 
 const isProduction = import.meta.env.PROD;
 const canonicalURL = new URL(Astro.url.pathname, SITE_URL).toString();
-const ogImage = `${SITE_URL}/og-image.png`;
+const ogImage = `${SITE_URL}/og-image.jpg`;
 ---
 
 <!doctype html>
@@ -42,7 +42,7 @@ const ogImage = `${SITE_URL}/og-image.png`;
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Logo da Escola Livre de Artes Arena da Cultura" />
+    <meta property="og:image:alt" content="Arena da Cultura — Centro cultural em Belo Horizonte" />
     <meta property="og:locale" content="pt_BR" />
 
     <!-- Twitter Card -->
@@ -50,7 +50,7 @@ const ogImage = `${SITE_URL}/og-image.png`;
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
-    <meta name="twitter:image:alt" content="Logo da Escola Livre de Artes Arena da Cultura" />
+    <meta name="twitter:image:alt" content="Arena da Cultura — Centro cultural em Belo Horizonte" />
 
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
