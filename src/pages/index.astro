@@ -193,7 +193,8 @@ import { courses } from "../data/courses";
       // Filtered: show all filtered, hide button
       showLoadMore(false);
       cards.forEach((card) => {
-        if (card.dataset._filtered === "true") card.style.display = "";
+        if (card.dataset._filtered === "true") showCard(card);
+        else hideCard(card);
       });
       return;
     }
@@ -202,10 +203,12 @@ import { courses } from "../data/courses";
     const filtered: HTMLElement[] = [];
     cards.forEach((card) => {
       if (card.dataset._filtered === "true") filtered.push(card);
+      else hideCard(card);
     });
 
     filtered.forEach((card, i) => {
-      card.style.display = i < mobileLimit ? "" : "none";
+      if (i < mobileLimit) showCard(card);
+      else hideCard(card);
     });
 
     const remaining = filtered.length - mobileLimit;
@@ -224,6 +227,33 @@ import { courses } from "../data/courses";
 
   window.addEventListener("resize", () => applyLoadMore());
 
+  // --- Vue-style list transition ---
+  function showCard(card: HTMLElement) {
+    if (card.style.display !== "none" && !card.classList.contains("card-leave"))
+      return;
+    card.style.display = "";
+    card.classList.remove("card-leave");
+    card.classList.add("card-enter");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => card.classList.remove("card-enter"));
+    });
+  }
+
+  function hideCard(card: HTMLElement) {
+    if (card.style.display === "none") return;
+    card.classList.add("card-leave");
+    const onEnd = () => {
+      card.removeEventListener("transitionend", onEnd);
+      if (card.classList.contains("card-leave")) {
+        card.style.display = "none";
+        card.classList.remove("card-leave");
+      }
+    };
+    card.addEventListener("transitionend", onEnd);
+    // Fallback in case transitionend doesn't fire
+    setTimeout(onEnd, 300);
+  }
+
   function applyFilters() {
     let visibleCount = 0;
     const query = searchQuery
@@ -241,9 +271,7 @@ import { courses } from "../data/courses";
         activeLocation === "all" || cardLocation === activeLocation;
       const matchSearch = !query || cardName.includes(query);
       const visible = matchArea && matchLocation && matchSearch;
-      // Mark filtered state, but don't set display yet (load-more handles it on mobile)
       card.dataset._filtered = visible ? "true" : "false";
-      card.style.display = visible ? "" : "none";
       if (visible) visibleCount++;
     });
     // Reset mobile limit on filter change
@@ -301,6 +329,23 @@ import { courses } from "../data/courses";
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-md);
+  }
+
+  /* Vue-style list transitions */
+  :global(.course-card) {
+    transition:
+      opacity 250ms ease,
+      transform 250ms ease;
+  }
+
+  :global(.course-card.card-enter) {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+
+  :global(.course-card.card-leave) {
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
   }
 
   .load-more-btn {

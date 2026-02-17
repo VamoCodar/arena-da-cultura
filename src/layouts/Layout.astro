@@ -8,6 +8,8 @@ const {
   title = "Escola Livre de Artes — Arena da Cultura",
   description = "Cursos gratuitos de arte e cultura em Belo Horizonte. Consulte a programação do 1° Semestre de 2026 da Escola Livre de Artes Arena da Cultura.",
 } = Astro.props;
+
+const isProduction = import.meta.env.PROD;
 ---
 
 <!doctype html>
@@ -41,18 +43,26 @@ const {
     <title>{title}</title>
   </head>
   <body>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9HYXY6V0MK"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
+    {
+      isProduction && (
+        <>
+          <!-- Google tag (gtag.js) -->
+          <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-9HYXY6V0MK"
+          />
+          <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
 
-      gtag("config", "G-9HYXY6V0MK");
-    </script>
+            gtag("config", "G-9HYXY6V0MK");
+          </script>
+        </>
+      )
+    }
     <slot />
   </body>
 </html>
