@@ -27,3 +27,13 @@ export function areaBadgeHTML(
 ): string {
   return `<span class="badge" style="background:${colors.bg};color:${colors.text}"><span class="badge-icon material-symbols-outlined">${icon}</span> ${area}</span>`;
 }
+
+/** Generate online badge HTML string (for client-side innerHTML) */
+export function onlineBadgeHTML(): string {
+  return `<span class="online-badge" style='height: 24px;'><span class="material-symbols-outlined online-badge-icon">language</span> Online</span>`;
+}
+
+/** Check if a location string indicates an online course */
+export function isOnlineLocation(location: string): boolean {
+  return location.includes("Online") || location.includes("EAD");
+}

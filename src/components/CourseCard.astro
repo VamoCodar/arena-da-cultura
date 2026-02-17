@@ -3,6 +3,7 @@ import type { Course } from "../data/courses";
 import { JOTFORM_IDS } from "../data/courses";
 import AreaBadge from "./AreaBadge.astro";
 import AgeBadge from "./AgeBadge.astro";
+import OnlineBadge from "./OnlineBadge.astro";
 
 interface Props {
   course: Course;
@@ -61,16 +62,7 @@ const specificDatesFormatted =
   <div class="card-header">
     <div class="card-badges">
       <AreaBadge area={course.area} />
-      {
-        isOnline && (
-          <span class="online-badge">
-            <span class="material-symbols-outlined" style="font-size:12px">
-              language
-            </span>
-            Online
-          </span>
-        )
-      }
+      {isOnline && <OnlineBadge />}
     </div>
     <!--     style={`background:${colors.text}`} -->
     <a
@@ -175,17 +167,7 @@ const specificDatesFormatted =
     flex-wrap: wrap;
   }
 
-  .online-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
-    font-size: 0.7rem;
-    font-weight: 600;
-    background: #e3f2fd;
-    color: #1565c0;
-  }
+
 
   .card-enroll-btn {
     display: flex;

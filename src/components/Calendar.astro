@@ -174,7 +174,12 @@ const locationsJSON = JSON.stringify(locations);
   import interactionPlugin from "@fullcalendar/interaction";
   import TomSelect from "tom-select";
   import "tom-select/dist/css/tom-select.default.css";
-  import { ageBadgeHTML, areaBadgeHTML } from "../utils/badges";
+  import {
+    ageBadgeHTML,
+    areaBadgeHTML,
+    onlineBadgeHTML,
+    isOnlineLocation,
+  } from "../utils/badges";
 
   const allEvents = JSON.parse((window as any).__FC_EVENTS__);
   const areaColors = JSON.parse((window as any).__AREA_COLORS__);
@@ -248,11 +253,14 @@ const locationsJSON = JSON.stringify(locations);
         <div class="listing-event" data-course-id="${e.extendedProps.courseId}">
           <div class="listing-event-top">
             ${areaBadgeHTML(e.extendedProps.area, c, icon)}
+               ${isOnlineLocation(e.extendedProps.location) ? onlineBadgeHTML() : ""}
+               <span style='flex: 1;'></span>
             <span class="listing-event-time"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-2px">schedule</span> ${e.extendedProps.time}</span>
           </div>
           <div class="listing-event-name">${e.title}</div>
           <div class="listing-event-meta">
             <span class="listing-event-location"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-2px">location_on</span> ${e.extendedProps.location}</span>
+         
             ${ageBadgeHTML(e.extendedProps.ageRange)}
           </div>
         </div>

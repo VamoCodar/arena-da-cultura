@@ -33,8 +33,8 @@ export const AREA_COLORS: Record<string, { bg: string; text: string; dot: string
 export const AREA_ICONS: Record<string, string> = {
   "Artes Visuais": "palette",
   Audiovisual: "movie",
-  Circo: "celebration",
-  Dança: "directions_run",
+  Circo: "festival",
+  Dança: "falling",
   "Design Popular": "design_services",
   Música: "music_note",
   Patrimônio: "account_balance",

@@ -57,7 +57,7 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
 </script>
 
 <script>
-  import { formatAgeBadge, ageBadgeHTML, areaBadgeHTML } from "../utils/badges";
+  import { formatAgeBadge, ageBadgeHTML, areaBadgeHTML, onlineBadgeHTML, isOnlineLocation } from "../utils/badges";
 
   const allCourses = JSON.parse((window as any).__MODAL_COURSES__);
   const areaColors = JSON.parse((window as any).__MODAL_AREA_COLORS__);
@@ -254,7 +254,7 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     body.innerHTML = `
       <div class="modal-header">
         ${areaBadgeHTML(course.area, c, icon)}
-        ${isOnline(course.location) ? '<span class="online-badge"><span class="material-symbols-outlined" style="font-size:12px">language</span> Online</span>' : ""}
+        ${isOnlineLocation(course.location) ? onlineBadgeHTML() : ""}
         ${ageBadgeHTML(course.ageRange)}
       </div>
 
