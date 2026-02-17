@@ -64,7 +64,7 @@ import { areas, locations, AREA_COLORS, AREA_ICONS } from "../data/courses";
         id="search-clear"
         class="search-clear"
         aria-label="Limpar busca"
-        hidden>
+        style="display:none">
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
@@ -252,7 +252,7 @@ import { areas, locations, AREA_COLORS, AREA_ICONS } from "../data/courses";
 
   .search-wrapper {
     position: relative;
-    min-width: 170px;
+    width: 220px;
   }
 
   .search-icon {
@@ -265,12 +265,24 @@ import { areas, locations, AREA_COLORS, AREA_ICONS } from "../data/courses";
     pointer-events: none;
   }
 
+  .search-input {
+    width: 100%;
+    padding: 8px 32px 8px 36px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: white;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast);
+    outline: none;
+  }
+
   .search-clear {
     position: absolute;
     right: 6px;
     top: 50%;
     transform: translateY(-50%);
-    display: none;
     align-items: center;
     justify-content: center;
     width: 24px;
@@ -293,19 +305,6 @@ import { areas, locations, AREA_COLORS, AREA_ICONS } from "../data/courses";
     color: white;
   }
 
-  .search-input {
-    width: 100%;
-    padding: 8px 32px 8px 36px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-md);
-    background: white;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    transition: border-color var(--transition-fast);
-    outline: none;
-  }
-
   .search-input::placeholder {
     color: var(--text-muted);
   }
@@ -316,7 +315,9 @@ import { areas, locations, AREA_COLORS, AREA_ICONS } from "../data/courses";
   }
 
   .filter-select-wrapper {
-    flex: 1 0 320px;
+    min-width: 320px;
+    max-width: 320px;
+    width: 100%;
   }
 
   .filter-counter {

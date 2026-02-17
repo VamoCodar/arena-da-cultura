@@ -274,23 +274,23 @@ import { courses } from "../data/courses";
   });
 
   // Listen for search input
-  const searchClear = document.getElementById(
-    "search-clear",
-  ) as HTMLButtonElement;
+  const searchClear = document.getElementById("search-clear");
 
   searchInput.addEventListener("input", () => {
     searchQuery = searchInput.value.trim();
-    searchClear.style.display = searchQuery ? "flex" : "none";
+    if (searchClear) searchClear.style.display = searchQuery ? "flex" : "none";
     applyFilters();
   });
 
-  searchClear.addEventListener("click", () => {
-    searchInput.value = "";
-    searchQuery = "";
-    searchClear.style.display = "none";
-    searchInput.focus();
-    applyFilters();
-  });
+  if (searchClear) {
+    searchClear.addEventListener("click", () => {
+      searchInput.value = "";
+      searchQuery = "";
+      searchClear.style.display = "none";
+      searchInput.focus();
+      applyFilters();
+    });
+  }
 
   // Initialize count
   applyFilters();
