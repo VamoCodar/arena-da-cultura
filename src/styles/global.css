@@ -4,7 +4,9 @@
    ========================================== */
 
 /* Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -12,54 +14,54 @@
 
 :root {
   /* Base palette */
-  --bg: #FAFAF8;
-  --bg-card: #FFFFFF;
-  --bg-elevated: #F5F5F0;
-  --text-primary: #1A1A1A;
-  --text-secondary: #5A5A5A;
-  --text-muted: #8A8A8A;
-  --border: #E8E8E4;
-  --border-hover: #D0D0CC;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+  --bg: #fafaf8;
+  --bg-card: #ffffff;
+  --bg-elevated: #f5f5f0;
+  --text-primary: #1a1a1a;
+  --text-secondary: #5a5a5a;
+  --text-muted: #8a8a8a;
+  --border: #e8e8e4;
+  --border-hover: #d0d0cc;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
 
   /* Accent */
-  --accent: #2D5A27;
-  --accent-light: #E8F5E3;
-  --accent-hover: #1E3D1A;
+  --accent: #2d5a27;
+  --accent-light: #e8f5e3;
+  --accent-hover: #1e3d1a;
 
   /* Area colors */
-  --area-artes-visuais-bg: #FFF3E0;
-  --area-artes-visuais-text: #E65100;
-  --area-artes-visuais-dot: #FF9800;
-  --area-audiovisual-bg: #E3F2FD;
-  --area-audiovisual-text: #1565C0;
-  --area-audiovisual-dot: #42A5F5;
-  --area-circo-bg: #FCE4EC;
-  --area-circo-text: #AD1457;
-  --area-circo-dot: #EC407A;
-  --area-danca-bg: #F3E5F5;
-  --area-danca-text: #7B1FA2;
-  --area-danca-dot: #AB47BC;
-  --area-design-bg: #E8F5E9;
-  --area-design-text: #2E7D32;
-  --area-design-dot: #66BB6A;
-  --area-musica-bg: #E0F7FA;
-  --area-musica-text: #00695C;
-  --area-musica-dot: #26A69A;
-  --area-patrimonio-bg: #FFF8E1;
-  --area-patrimonio-text: #F57F17;
-  --area-patrimonio-dot: #FFCA28;
-  --area-teatro-bg: #EDE7F6;
-  --area-teatro-text: #4527A0;
-  --area-teatro-dot: #7E57C2;
-  --area-bastidores-bg: #EFEBE9;
-  --area-bastidores-text: #4E342E;
-  --area-bastidores-dot: #8D6E63;
-  --area-gestao-bg: #E8EAF6;
+  --area-artes-visuais-bg: #fff3e0;
+  --area-artes-visuais-text: #e65100;
+  --area-artes-visuais-dot: #ff9800;
+  --area-audiovisual-bg: #e3f2fd;
+  --area-audiovisual-text: #1565c0;
+  --area-audiovisual-dot: #42a5f5;
+  --area-circo-bg: #fce4ec;
+  --area-circo-text: #ad1457;
+  --area-circo-dot: #ec407a;
+  --area-danca-bg: #f3e5f5;
+  --area-danca-text: #7b1fa2;
+  --area-danca-dot: #ab47bc;
+  --area-design-bg: #e8f5e9;
+  --area-design-text: #2e7d32;
+  --area-design-dot: #66bb6a;
+  --area-musica-bg: #e0f7fa;
+  --area-musica-text: #00695c;
+  --area-musica-dot: #26a69a;
+  --area-patrimonio-bg: #fff8e1;
+  --area-patrimonio-text: #f57f17;
+  --area-patrimonio-dot: #ffca28;
+  --area-teatro-bg: #ede7f6;
+  --area-teatro-text: #4527a0;
+  --area-teatro-dot: #7e57c2;
+  --area-bastidores-bg: #efebe9;
+  --area-bastidores-text: #4e342e;
+  --area-bastidores-dot: #8d6e63;
+  --area-gestao-bg: #e8eaf6;
   --area-gestao-text: #283593;
-  --area-gestao-dot: #5C6BC0;
+  --area-gestao-dot: #5c6bc0;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -78,8 +80,9 @@
   --radius-full: 9999px;
 
   /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-display: 'Montserrat', 'Inter', sans-serif;
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Montserrat", "Inter", sans-serif;
 
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -109,17 +112,28 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: var(--font-display);
   font-weight: 700;
   line-height: 1.2;
   color: var(--text-primary);
 }
 
-h1 { font-size: clamp(1.75rem, 5vw, 2.75rem); }
-h2 { font-size: clamp(1.5rem, 4vw, 2.25rem); }
-h3 { font-size: clamp(1.125rem, 3vw, 1.5rem); }
-h4 { font-size: 1.125rem; }
+h1 {
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+}
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+h3 {
+  font-size: clamp(1.125rem, 3vw, 1.5rem);
+}
+h4 {
+  font-size: 1.125rem;
+}
 
 p {
   color: var(--text-secondary);
@@ -351,12 +365,23 @@ a:hover {
   margin-top: var(--space-xs);
 }
 
-.fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active {
-	color: white;
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  color: white;
 }
 .fc-button-group {
-	display: flex;
-	column-gap: 8px;
+  display: flex;
+  column-gap: 8px;
+}
+.fc-toolbar-title {
+  font-weight: 600 !important;
+  text-transform: capitalize;
+}
+.fc-header-toolbar {
+  flex-direction: row-reverse;
+}
+.fc-header-toolbar .fc-toolbar-chunk:last-child {
+  display: none;
 }
 
 /* ==========================================
@@ -389,14 +414,17 @@ a:hover {
 }
 
 /* Optimize images */
-img, svg {
+img,
+svg {
   max-width: 100%;
   height: auto;
 }
 
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
