@@ -14,7 +14,6 @@ const {
 
 const isProduction = import.meta.env.PROD;
 const canonicalURL = new URL(Astro.url.pathname, SITE_URL).toString();
-const ogImage = `${SITE_URL}/og-image.jpg`;
 ---
 
 <!doctype html>
@@ -39,18 +38,12 @@ const ogImage = `${SITE_URL}/og-image.jpg`;
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <!-- <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Arena da Cultura — Centro cultural em Belo Horizonte" /> -->
     <meta property="og:locale" content="pt_BR" />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <!-- <meta name="twitter:image" content={ogImage} /> -->
-    <meta name="twitter:image:alt" content="Arena da Cultura — Centro cultural em Belo Horizonte" />
 
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -82,7 +75,6 @@ const ogImage = `${SITE_URL}/og-image.jpg`;
       "description": description,
       "url": SITE_URL,
       "logo": `${SITE_URL}/favicon.svg`,
-      // "image": ogImage,
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Belo Horizonte",
