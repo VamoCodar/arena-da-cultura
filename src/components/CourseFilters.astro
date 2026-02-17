@@ -59,6 +59,14 @@ import { areas, locations, AREA_COLORS, AREA_ICONS } from "../data/courses";
         aria-label="Buscar curso por nome"
         autocomplete="off"
       />
+      <button
+        type="button"
+        id="search-clear"
+        class="search-clear"
+        aria-label="Limpar busca"
+        hidden>
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
     <span style="flex:1; display:block"></span>
     <div class="filter-counter" id="filter-counter" aria-live="polite">
@@ -257,9 +265,37 @@ import { areas, locations, AREA_COLORS, AREA_ICONS } from "../data/courses";
     pointer-events: none;
   }
 
+  .search-clear {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .search-clear .material-symbols-outlined {
+    font-size: 14px;
+  }
+
+  .search-clear:hover {
+    background: var(--text-muted);
+    color: white;
+  }
+
   .search-input {
     width: 100%;
-    padding: 8px 12px 8px 36px;
+    padding: 8px 32px 8px 36px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
     background: white;
