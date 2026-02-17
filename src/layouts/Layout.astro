@@ -4,12 +4,17 @@ interface Props {
   description?: string;
 }
 
+const SITE_URL = "https://arenadacultura.com.br";
+const SITE_NAME = "Escola Livre de Artes — Arena da Cultura";
+
 const {
-  title = "Escola Livre de Artes — Arena da Cultura",
+  title = SITE_NAME,
   description = "Cursos gratuitos de arte e cultura em Belo Horizonte. Consulte a programação do 1° Semestre de 2026 da Escola Livre de Artes Arena da Cultura.",
 } = Astro.props;
 
 const isProduction = import.meta.env.PROD;
+const canonicalURL = new URL(Astro.url.pathname, SITE_URL).toString();
+const ogImage = `${SITE_URL}/og-image.png`;
 ---
 
 <!doctype html>
@@ -17,17 +22,49 @@ const isProduction = import.meta.env.PROD;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SEO -->
+    <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Escola Livre de Artes — Arena da Cultura" />
+    <meta name="keywords" content="cursos gratuitos, arte, cultura, Belo Horizonte, escola livre de artes, arena da cultura, dança, música, teatro, artes visuais, circo, audiovisual, design, PBH" />
     <meta name="theme-color" content="#2D5A27" />
+    <meta name="color-scheme" content="light" />
 
     <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Logo da Escola Livre de Artes Arena da Cultura" />
+    <meta property="og:locale" content="pt_BR" />
 
-    <!-- Fonts -->
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content="Logo da Escola Livre de Artes Arena da Cultura" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Performance: DNS prefetch & preconnect -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Fonts (with display=swap for performance) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -37,10 +74,71 @@ const isProduction = import.meta.env.PROD;
       rel="stylesheet"
     />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Escola Livre de Artes — Arena da Cultura",
+      "description": description,
+      "url": SITE_URL,
+      "logo": `${SITE_URL}/favicon.svg`,
+      "image": ogImage,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Belo Horizonte",
+        "addressRegion": "MG",
+        "addressCountry": "BR"
+      },
+      "sameAs": [],
+      "areaServed": {
+        "@type": "City",
+        "name": "Belo Horizonte"
+      },
+      "isAccessibleForFree": true,
+      "provider": {
+        "@type": "GovernmentOrganization",
+        "name": "Prefeitura de Belo Horizonte"
+      }
+    })} />
 
-    <title>{title}</title>
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": SITE_NAME,
+      "url": SITE_URL,
+      "description": description,
+      "inLanguage": "pt-BR",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${SITE_URL}/#cursos`,
+        "query-input": "required name=search_term_string"
+      }
+    })} />
+
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Início",
+          "item": SITE_URL
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Cursos",
+          "item": `${SITE_URL}/#cursos`
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Agenda",
+          "item": `${SITE_URL}/#agenda`
+        }
+      ]
+    })} />
   </head>
   <body>
     {

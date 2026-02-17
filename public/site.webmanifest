@@ -1,0 +1,26 @@
+{
+  "name": "Escola Livre de Artes — Arena da Cultura",
+  "short_name": "Arena da Cultura",
+  "description": "Cursos gratuitos de arte e cultura em Belo Horizonte — Escola Livre de Artes Arena da Cultura",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF8",
+  "theme_color": "#2D5A27",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
