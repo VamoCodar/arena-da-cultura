@@ -378,8 +378,11 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     if (match) {
       const hashSlug = match[1];
       // Try slug match first, fall back to legacy numeric ID
-      const course = allCourses.find((c: any) => slugify(c.name) === hashSlug)
-        || (/^\d+$/.test(hashSlug) ? allCourses.find((c: any) => c.id === Number(hashSlug)) : null);
+      const course =
+        allCourses.find((c: any) => slugify(c.name) === hashSlug) ||
+        (/^\d+$/.test(hashSlug)
+          ? allCourses.find((c: any) => c.id === Number(hashSlug))
+          : null);
       if (course) {
         requestAnimationFrame(() => openModal(course.id));
       }
@@ -660,6 +663,7 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
   .mini-cal {
     flex: 0 0 auto;
     min-width: 210px;
+    min-height: 180px;
     scroll-snap-align: start;
     background: var(--bg-elevated);
     border-radius: var(--radius-md);
