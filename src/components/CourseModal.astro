@@ -59,6 +59,7 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
 <script>
   import { formatAgeBadge, ageBadgeHTML, areaBadgeHTML, onlineBadgeHTML, isOnlineLocation } from "../utils/badges";
   import { slugify, courseSlug } from "../utils/slug";
+  import { SHARE_VERSION } from "../utils/version";
 
   const allCourses = JSON.parse((window as any).__MODAL_COURSES__);
   const areaColors = JSON.parse((window as any).__MODAL_AREA_COLORS__);
@@ -98,10 +99,6 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
       ? null
       : `https://www.google.com/maps/search/${encodeURIComponent(loc + ", Belo Horizonte, MG")}`;
   }
-
-  // Bump when og:image/meta change \u2014 WhatsApp/Facebook cache previews by
-  // exact URL, so a new query param forces a fresh scrape.
-  const SHARE_VERSION = "2";
 
   function getShareUrl(course: any): string {
     // Static stub page with course-specific OG/meta tags \u2014 redirects humans

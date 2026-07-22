@@ -87,12 +87,82 @@ const fontOpts = {
   defaultFontFamily: "Montserrat",
 };
 
-for (const [area, c] of Object.entries(AREAS)) {
-  const svg = buildSvg(area, c);
+// ---------- capa principal (home) ----------
+// Números extraídos de courses.ts pra não desatualizar entre semestres
+function siteStats() {
+  const ts = readFileSync(join(ROOT, "src", "data", "courses.ts"), "utf-8");
+  const csv = ts.slice(ts.indexOf("const csvData"));
+  const nCourses = (csv.match(/enrollmentUrl: "/g) || []).length;
+  const nAreas = new Set([...csv.matchAll(/area: "([^"]+)"/g)].map((m) => m[1])).size;
+  return { nCourses, nAreas };
+}
+
+function buildHomeSvg() {
+  const W = 1200, H = 630;
+  const green = "#2D5A27", pastel = "#E8F5E3";
+  const { nCourses, nAreas } = siteStats();
+
+  // logo real do site (paths brancos) sobre cartão verde;
+  // <g> em vez de <svg> aninhado — resvg não renderiza nested svg
+  const logoInner = readFileSync(join(ROOT, "public", "arena-logo.svg"), "utf-8")
+    .replace(/^[\s\S]*?<svg[^>]*>/, "")
+    .replace(/<\/svg>\s*$/, "");
+  const logo = `<g transform="translate(554 70) scale(${92 / 314})">${logoInner}</g>`;
+
+  const pill = (x, w, label) => `
+    <rect x="${x}" y="430" width="${w}" height="58" rx="29" fill="#ffffff"/>
+    <rect x="${x}" y="430" width="${w}" height="58" rx="29" fill="none" stroke="${green}" stroke-opacity="0.3" stroke-width="2.5"/>
+    <text x="${x + w / 2}" y="469" text-anchor="middle" font-family="Montserrat" font-weight="700" font-size="29" fill="${green}">${esc(label)}</text>`;
+
+  // pills centralizadas: larguras + 2 gaps de 24
+  const pw = [230, 200, 264];
+  const totalPills = pw[0] + pw[1] + pw[2] + 48;
+  const p0 = (W - totalPills) / 2;
+
+  // fileira centralizada com os ícones de todas as áreas, cada um na sua cor
+  const rowAreas = Object.entries(AREAS).filter(([a]) => a !== "Artes");
+  const rowSpan = (rowAreas.length - 1) * 62 + 40;
+  const iconRow = rowAreas
+    .map(([, c], i) => icon(c.icon, (W - rowSpan) / 2 + i * 62, 542, 40, c.text, 0.9))
+    .join("");
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="${W}" height="${H}" fill="${pastel}"/>
+
+  <circle cx="1120" cy="70" r="260" fill="${green}" opacity="0.08"/>
+  <circle cx="90" cy="620" r="200" fill="${green}" opacity="0.07"/>
+
+  <rect x="${W / 2 - 65}" y="52" width="130" height="130" rx="32" fill="${green}"/>
+  ${logo}
+
+  <text x="${W / 2}" y="248" text-anchor="middle" font-family="Montserrat" font-weight="700"
+        font-size="26" letter-spacing="2.5" fill="${green}" opacity="0.75">ESCOLA LIVRE DE ARTES — 2º SEMESTRE/2026</text>
+  <text x="${W / 2}" y="332" text-anchor="middle" font-family="Montserrat" font-weight="800"
+        font-size="80" fill="${green}">Arena da Cultura</text>
+  <text x="${W / 2}" y="392" text-anchor="middle" font-family="Montserrat" font-weight="600"
+        font-size="30" fill="${green}" opacity="0.85">Cursos gratuitos de arte e cultura em Belo Horizonte</text>
+
+  ${pill(p0, pw[0], `${nCourses} cursos`)}
+  ${pill(p0 + pw[0] + 24, pw[1], `${nAreas} áreas`)}
+  ${pill(p0 + pw[0] + pw[1] + 48, pw[2], "100% gratuito")}
+
+  ${iconRow}
+
+  <rect x="0" y="${H - 14}" width="${W}" height="14" fill="${green}"/>
+</svg>`;
+}
+
+const jobs = Object.entries(AREAS).map(([area, c]) => [
+  `${slugify(area)}.png`,
+  buildSvg(area, c),
+]);
+jobs.push(["home.png", buildHomeSvg()]);
+
+for (const [name, svg] of jobs) {
   const png = new Resvg(svg, { font: fontOpts, fitTo: { mode: "original" } })
     .render()
     .asPng();
-  const file = join(OUT, `${slugify(area)}.png`);
+  const file = join(OUT, name);
   writeFileSync(file, png);
   console.log(file, `${(png.length / 1024).toFixed(0)}kB`);
 }

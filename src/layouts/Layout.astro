@@ -1,4 +1,6 @@
 ---
+import { SHARE_VERSION } from "../utils/version";
+
 interface Props {
   title?: string;
   description?: string;
@@ -16,7 +18,10 @@ const {
   image,
 } = Astro.props;
 
-const imageURL = image ? new URL(image, SITE_URL).toString() : null;
+// ?v= fura o cache do CDN/crawler quando a arte muda
+const imageURL = image
+  ? `${new URL(image, SITE_URL).toString()}?v=${SHARE_VERSION}`
+  : null;
 
 const isProduction = import.meta.env.PROD;
 const canonicalURL = new URL(Astro.url.pathname, SITE_URL).toString();
