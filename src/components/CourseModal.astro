@@ -58,6 +58,7 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
 
 <script>
   import { formatAgeBadge, ageBadgeHTML, areaBadgeHTML, onlineBadgeHTML, isOnlineLocation } from "../utils/badges";
+  import { slugify, courseSlug } from "../utils/slug";
 
   const allCourses = JSON.parse((window as any).__MODAL_COURSES__);
   const areaColors = JSON.parse((window as any).__MODAL_AREA_COLORS__);
@@ -98,19 +99,11 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
       : `https://www.google.com/maps/search/${encodeURIComponent(loc + ", Belo Horizonte, MG")}`;
   }
 
-  function slugify(text: string): string {
-    return text
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-  }
-
   function getShareUrl(course: any): string {
-    const url = new URL(window.location.href);
-    url.hash = `curso-${slugify(course.name)}`;
-    return url.toString();
+    // Static stub page with course-specific OG/meta tags \u2014 redirects humans
+    // back here with the modal open. Crawlers ignore #hash, so the hash URL
+    // can't be the share target.
+    return `${window.location.origin}/curso/${courseSlug(course)}/`;
   }
 
   // --- Mini Calendar ---
@@ -174,7 +167,10 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
       "Novembro",
       "Dezembro",
     ];
-    const today = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 10);
 
     let html = `<div class="mini-cal-wrap">`;
     html += `<div class="mini-cal-label"><span class="material-symbols-outlined" style="font-size:16px">calendar_month</span> Calendário do curso</div>`;
@@ -329,7 +325,7 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     backdrop.setAttribute("aria-hidden", "false");
     backdrop.classList.add("open");
     document.body.style.overflow = "hidden";
-    history.replaceState(null, "", `#curso-${slugify(course.name)}`);
+    history.replaceState(null, "", `#curso-${courseSlug(course)}`);
   }
 
   function closeModal() {
@@ -377,8 +373,10 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     const match = window.location.hash.match(/^#curso-(.+)$/);
     if (match) {
       const hashSlug = match[1];
-      // Try slug match first, fall back to legacy numeric ID
+      // Full slug (name+location) first; then legacy name-only slugs from
+      // links shared before this format existed; then legacy numeric ID.
       const course =
+        allCourses.find((c: any) => courseSlug(c) === hashSlug) ||
         allCourses.find((c: any) => slugify(c.name) === hashSlug) ||
         (/^\d+$/.test(hashSlug)
           ? allCourses.find((c: any) => c.id === Number(hashSlug))
@@ -575,6 +573,7 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
 
   .modal-btn-primary:hover {
     background: var(--accent-hover);
+    color: #fff;
   }
 
   .modal-btn-share {

@@ -287,7 +287,13 @@ const locationsJSON = JSON.stringify(locations);
   // Determine initial date: use today if within valid range, otherwise range start
   const validStart = "2026-08-01";
   const validEnd = "2027-01-01";
-  const todayStr = new Date().toISOString().slice(0, 10);
+  // Local date (not UTC) — toISOString() would shift to the next day for
+  // evening users in negative-offset zones (e.g. BRT), selecting the wrong day
+  // and mismatching FullCalendar's own local "today" highlight.
+  const now = new Date();
+  const todayStr = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
   const initialDate =
     todayStr >= validStart && todayStr < validEnd ? todayStr : validStart;
 
@@ -527,6 +533,26 @@ const locationsJSON = JSON.stringify(locations);
     color: var(--accent) !important;
   }
 
+  /* "+N mais" popover — must sit above the sticky listing and not be clipped */
+  .fc .fc-popover {
+    z-index: 100 !important;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .fc .fc-popover-header {
+    background: var(--bg-elevated);
+    padding: 6px 10px;
+    font-weight: 600;
+  }
+
+  .fc .fc-popover-body {
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
   /* List view */
   .fc .fc-list-event-title a {
     color: var(--text-primary) !important;
@@ -706,7 +732,9 @@ const locationsJSON = JSON.stringify(locations);
     border-radius: var(--radius-lg);
     /* padding: var(--space-md); */
     padding-top: 10px;
-    overflow: hidden;
+    /* was overflow:hidden — clipped the "+N mais" popover; content is inset by
+       padding so rounded corners stay clean without it */
+    overflow: visible;
     min-width: 0;
   }
 
