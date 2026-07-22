@@ -1,3 +1,5 @@
+import { SYNOPSES } from "./synopses";
+
 export interface Course {
   id: number;
   name: string;
@@ -14,6 +16,7 @@ export interface Course {
   isRecurring: boolean;
   specificDates: string[]; // for non-recurring courses "2026-03-04"
   extraMeetings: string | null; // e.g. "+ 1 encontro em dia e horário a combinar"
+  synopsis: string | null; // official synopsis from the PBH PDF
 }
 
 export const AREA_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
@@ -396,6 +399,7 @@ const csvData: Omit<
   | "specificDates"
   | "startDate"
   | "endDate"
+  | "synopsis"
 >[] = [
   // ---------- Artes Visuais ----------
   {
@@ -1338,6 +1342,8 @@ export const courses: Course[] = csvData.map((c, i) => {
     isRecurring: !specific,
     specificDates: specific ? parseSpecificDates(c.schedule) : [],
     extraMeetings: EXTRA_MEETINGS[i + 1] || null,
+    // turmas (T1)/(T2)... compartilham a sinopse do curso-base
+    synopsis: SYNOPSES[c.name.replace(/\s*\(T\d\)$/, "")] ?? null,
   };
 });
 

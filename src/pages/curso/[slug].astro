@@ -11,40 +11,40 @@ import type { Course } from "../../data/courses";
 import { courseSlug, slugify } from "../../utils/slug";
 
 export function getStaticPaths() {
-  const seen = new Set<string>();
-  return courses.map((course) => {
-    const slug = courseSlug(course);
-    if (seen.has(slug)) throw new Error(`Slug duplicado: ${slug}`);
-    seen.add(slug);
-    return { params: { slug }, props: { course } };
-  });
+    const seen = new Set<string>();
+    return courses.map((course) => {
+        const slug = courseSlug(course);
+        if (seen.has(slug)) throw new Error(`Slug duplicado: ${slug}`);
+        seen.add(slug);
+        return { params: { slug }, props: { course } };
+    });
 }
 
 interface Props {
-  course: Course;
+    course: Course;
 }
 const { course } = Astro.props;
 const slug = courseSlug(course);
 
 const fmt = (iso: string) => {
-  const [, m, d] = iso.split("-");
-  return `${d}/${m}`;
+    const [, m, d] = iso.split("-");
+    return `${d}/${m}`;
 };
 
 const datesPart =
-  course.startDate && course.endDate
-    ? ` · ${fmt(course.startDate)} a ${fmt(course.endDate)}`
-    : "";
+    course.startDate && course.endDate
+        ? ` · ${fmt(course.startDate)} a ${fmt(course.endDate)}`
+        : "";
 
 const description = [
-  `${course.schedule}${datesPart}`,
-  course.location,
-  course.ageRange,
-  course.extraMeetings,
-  "Curso gratuito da Escola Livre de Artes Arena da Cultura, Belo Horizonte.",
+    `${course.schedule}${datesPart}`,
+    course.location,
+    course.ageRange,
+    course.extraMeetings,
+    "Curso gratuito da Escola Livre de Artes Arena da Cultura, Belo Horizonte.",
 ]
-  .filter(Boolean)
-  .join(" · ");
+    .filter(Boolean)
+    .join(" · ");
 
 const title = `${course.name} — Arena da Cultura`;
 // OG image por área, gerada por scripts/gen-og-images.mjs
@@ -52,102 +52,117 @@ const ogImage = `/og/${slugify(course.area)}.png`;
 const modalUrl = `/#curso-${slug}`;
 const anchor = JOTFORM_IDS[course.id];
 const enrollUrl = anchor
-  ? `${course.enrollmentUrl}#${anchor}`
-  : course.enrollmentUrl;
+    ? `${course.enrollmentUrl}#${anchor}`
+    : course.enrollmentUrl;
 ---
 
 <Layout title={title} description={description} image={ogImage}>
-  <main class="stub">
-    <article class="stub-card">
-      <p class="stub-area">{course.area}</p>
-      <h1 class="stub-title">{course.name}</h1>
-      <ul class="stub-info">
-        <li>{course.schedule}{datesPart}</li>
-        <li>{course.location}</li>
-        <li>{course.ageRange}</li>
-        {course.extraMeetings && <li>{course.extraMeetings}</li>}
-      </ul>
-      <div class="stub-actions">
-        <a class="stub-btn stub-btn-primary" href={modalUrl}>Ver detalhes no site</a>
-        <a class="stub-btn" href={enrollUrl} target="_blank" rel="noopener">
-          Inscrever-se
-        </a>
-      </div>
-      <p class="stub-redirect">Redirecionando…</p>
-    </article>
-  </main>
+    <main class="stub">
+        <article class="stub-card">
+            <p class="stub-area">{course.area}</p>
+            <h1 class="stub-title">{course.name}</h1>
+            <ul class="stub-info">
+                <li>{course.schedule}{datesPart}</li>
+                <li>{course.location}</li>
+                <li>{course.ageRange}</li>
+                {course.extraMeetings && <li>{course.extraMeetings}</li>}
+            </ul>
+            {course.synopsis && <p class="stub-synopsis">{course.synopsis}</p>}
+            <div class="stub-actions">
+                <a class="stub-btn stub-btn-primary" href={modalUrl}
+                    >Ver detalhes no site</a
+                >
+                <a
+                    class="stub-btn"
+                    href={enrollUrl}
+                    target="_blank"
+                    rel="noopener"
+                >
+                    Inscrever-se
+                </a>
+            </div>
+            <p class="stub-redirect">Redirecionando…</p>
+        </article>
+    </main>
 </Layout>
 
 <script is:inline define:vars={{ modalUrl }}>
-  // Crawlers read the meta above; humans go straight to the modal.
-  window.location.replace(modalUrl);
+    // Crawlers read the meta above; humans go straight to the modal.
+    window.location.replace(modalUrl);
 </script>
 
 <style>
-  .stub {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: var(--bg-elevated, #f7f7f5);
-    font-family: var(--font-sans, sans-serif);
-  }
-  .stub-card {
-    max-width: 480px;
-    width: 100%;
-    background: var(--bg-card, #fff);
-    border: 1px solid var(--border, #e4e4e0);
-    border-radius: 12px;
-    padding: 24px;
-  }
-  .stub-area {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--accent, #2d5a27);
-    margin-bottom: 8px;
-  }
-  .stub-title {
-    font-size: 1.25rem;
-    line-height: 1.35;
-    margin-bottom: 12px;
-    color: var(--text-primary, #1a1a1a);
-  }
-  .stub-info {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 0.875rem;
-    color: var(--text-secondary, #555);
-  }
-  .stub-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .stub-btn {
-    display: inline-block;
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: 1.5px solid var(--border, #e4e4e0);
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
-    color: var(--text-primary, #1a1a1a);
-  }
-  .stub-btn-primary {
-    background: var(--accent, #2d5a27);
-    border-color: var(--accent, #2d5a27);
-    color: #fff;
-  }
-  .stub-redirect {
-    margin-top: 16px;
-    font-size: 0.75rem;
-    color: var(--text-muted, #999);
-  }
+    .stub {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: var(--bg-elevated, #f7f7f5);
+        font-family: var(--font-sans, sans-serif);
+    }
+    .stub-card {
+        max-width: 480px;
+        width: 100%;
+        background: var(--bg-card, #fff);
+        border: 1px solid var(--border, #e4e4e0);
+        border-radius: 12px;
+        padding: 24px;
+    }
+    .stub-area {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--accent, #2d5a27);
+        margin-bottom: 8px;
+    }
+    .stub-title {
+        font-size: 1.25rem;
+        line-height: 1.35;
+        margin-bottom: 12px;
+        color: var(--text-primary, #1a1a1a);
+    }
+    .stub-info {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.875rem;
+        color: var(--text-secondary, #555);
+    }
+    .stub-synopsis {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: var(--text-secondary, #555);
+        margin: 0 0 18px;
+        font-weight: 500;
+    }
+    .stub-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .stub-btn {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: 1.5px solid var(--border, #e4e4e0);
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--text-primary, #1a1a1a);
+    }
+    .stub-btn-primary {
+        background: var(--accent, #2d5a27);
+        border-color: var(--accent, #2d5a27);
+        color: #fff;
+    }
+    .stub-redirect {
+        margin-top: 16px;
+        font-size: 0.75rem;
+        color: var(--text-muted, #999);
+    }
 </style>
