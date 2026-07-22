@@ -69,16 +69,26 @@ const specificDatesFormatted =
       <AreaBadge area={course.area} />
       {isOnline && <OnlineBadge />}
     </div>
-    <!--     style={`background:${colors.text}`} -->
-    <a
-      href={enrollUrl}
-      target="_blank"
-      rel="noopener"
-      class="card-enroll-btn tooltip"
-      data-tooltip="Inscrever-se"
-      aria-label={`Inscrever-se em ${course.name}`}>
-      <span class="material-symbols-outlined">open_in_new</span>
-    </a>
+    <div class="card-actions">
+      <button
+        type="button"
+        class="card-share-btn tooltip"
+        data-tooltip="Compartilhar"
+        data-share-url={shareUrl}
+        data-share-title={`${course.name} — Arena da Cultura`}
+        aria-label={`Compartilhar ${course.name}`}>
+        <span class="material-symbols-outlined">share</span>
+      </button>
+      <a
+        href={enrollUrl}
+        target="_blank"
+        rel="noopener"
+        class="card-enroll-btn tooltip"
+        data-tooltip="Inscrever-se"
+        aria-label={`Inscrever-se em ${course.name}`}>
+        <span class="material-symbols-outlined">open_in_new</span>
+      </a>
+    </div>
   </div>
 
   <!-- Title -->
@@ -174,27 +184,46 @@ const specificDatesFormatted =
 
 
 
-  .card-enroll-btn {
+  .card-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .card-enroll-btn,
+  .card-share-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 32px;
     height: 32px;
+    border: none;
+    background: transparent;
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
     flex-shrink: 0;
-    /* background: rgba(0, 0, 0, 0.05); */
+    cursor: pointer;
     transition: all var(--transition-fast);
     text-decoration: none;
   }
 
-  .card-enroll-btn .material-symbols-outlined {
+  .card-enroll-btn .material-symbols-outlined,
+  .card-share-btn .material-symbols-outlined {
     font-size: 18px;
   }
 
-  .card-enroll-btn:hover {
-    filter: brightness(0.85);
+  .card-enroll-btn:hover,
+  .card-share-btn:hover {
+    color: var(--accent);
+    background: var(--accent-light);
     transform: scale(1.08);
+  }
+
+  /* Copied-feedback: keep tooltip pinned after click on desktop */
+  .card-share-btn.copied::after {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
   }
 
   .card-title {
@@ -280,3 +309,42 @@ const specificDatesFormatted =
     transform: translateX(-50%) scale(1);
   }
 </style>
+
+<script>
+  // Hoisted once by Astro — one delegated listener for every card's share
+  // button. The card-open delegation (CourseModal) ignores <button> clicks,
+  // so this never fights the modal.
+  document.addEventListener("click", async (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>(
+      ".card-share-btn",
+    );
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const url = new URL(btn.dataset.shareUrl!, window.location.origin).href;
+    const title = btn.dataset.shareTitle || "Arena da Cultura";
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+      } catch {
+        /* user dismissed share sheet */
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      const original = btn.dataset.tooltip;
+      btn.dataset.tooltip = "Link copiado!";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.dataset.tooltip = original || "Compartilhar";
+        btn.classList.remove("copied");
+      }, 1500);
+    } catch {
+      /* clipboard blocked */
+    }
+  });
+</script>
