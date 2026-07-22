@@ -86,6 +86,11 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
     const footer = document.getElementById("modal-footer")!;
     const closeBtn = document.getElementById("modal-close")!;
 
+    // URL "base" da home (sem curso), capturada no load. Restaurada ao fechar
+    // o modal — necessário porque abrir passa a reescrever o path para a rota
+    // de compartilhamento. Este script só roda na home, então nunca é /curso/*.
+    const HOME_URL = location.pathname + location.search;
+
     // --- Helpers ---
     function escapeHtml(s: string): string {
         return s
@@ -309,14 +314,13 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
 
       ${
           course.synopsis
-              ? `<details class="modal-synopsis">
-        <summary class="modal-synopsis-label">
+              ? `<div class="modal-synopsis">
+        <div class="modal-synopsis-label">
           <span class="material-symbols-outlined" style="font-size:16px">description</span>
           Sobre o curso
-          <span class="material-symbols-outlined modal-synopsis-chevron">expand_more</span>
-        </summary>
+        </div>
         <p>${escapeHtml(course.synopsis)}</p>
-      </details>`
+      </div>`
               : ""
       }
 
@@ -366,19 +370,19 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
         backdrop.setAttribute("aria-hidden", "false");
         backdrop.classList.add("open");
         document.body.style.overflow = "hidden";
-        history.replaceState(null, "", `#curso-${courseSlug(course)}`);
+        // Barra de endereço já vira a rota de compartilhamento (stub com OG/meta
+        // próprios) — mesma URL do botão "Compartilhar". Assim copiar o link da
+        // barra já gera o preview certo, sem depender do botão.
+        history.replaceState(null, "", getShareUrl(course));
     }
 
     function closeModal() {
         backdrop.setAttribute("aria-hidden", "true");
         backdrop.classList.remove("open");
         document.body.style.overflow = "";
-        // Clean hash without scrolling
-        history.replaceState(
-            null,
-            "",
-            window.location.pathname + window.location.search,
-        );
+        // Restaura a URL da home (removendo a rota /curso/{slug} que openModal
+        // escreveu), sem rolar a página.
+        history.replaceState(null, "", HOME_URL);
     }
 
     closeBtn.addEventListener("click", closeModal);
@@ -581,23 +585,6 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
         text-transform: uppercase;
         letter-spacing: 0.04em;
         color: var(--text-primary);
-        cursor: pointer;
-        list-style: none;
-        user-select: none;
-    }
-
-    .modal-synopsis-label::-webkit-details-marker {
-        display: none;
-    }
-
-    .modal-synopsis-chevron {
-        font-size: 18px;
-        margin-left: auto;
-        transition: transform var(--transition-fast);
-    }
-
-    .modal-synopsis[open] .modal-synopsis-chevron {
-        transform: rotate(180deg);
     }
 
     .modal-synopsis p {
