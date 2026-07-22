@@ -99,11 +99,15 @@ const jotformIdsJSON = JSON.stringify(JOTFORM_IDS);
       : `https://www.google.com/maps/search/${encodeURIComponent(loc + ", Belo Horizonte, MG")}`;
   }
 
+  // Bump when og:image/meta change \u2014 WhatsApp/Facebook cache previews by
+  // exact URL, so a new query param forces a fresh scrape.
+  const SHARE_VERSION = "2";
+
   function getShareUrl(course: any): string {
     // Static stub page with course-specific OG/meta tags \u2014 redirects humans
     // back here with the modal open. Crawlers ignore #hash, so the hash URL
     // can't be the share target.
-    return `${window.location.origin}/curso/${courseSlug(course)}/`;
+    return `${window.location.origin}/curso/${courseSlug(course)}/?v=${SHARE_VERSION}`;
   }
 
   // --- Mini Calendar ---
