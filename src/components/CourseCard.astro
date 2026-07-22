@@ -1,6 +1,7 @@
 ---
 import type { Course } from "../data/courses";
 import { JOTFORM_IDS } from "../data/courses";
+import { courseSlug } from "../utils/slug";
 import AreaBadge from "./AreaBadge.astro";
 import AgeBadge from "./AgeBadge.astro";
 import OnlineBadge from "./OnlineBadge.astro";
@@ -34,6 +35,10 @@ const jotformAnchor = JOTFORM_IDS[course.id];
 const enrollUrl = jotformAnchor
   ? `${course.enrollmentUrl}#${jotformAnchor}`
   : course.enrollmentUrl;
+
+// Relative share path — resolved to an absolute URL client-side on click.
+// Same target as CourseModal so shared links land on the OG stub page.
+const shareUrl = `/curso/${courseSlug(course)}/`;
 
 const specificDatesFormatted =
   course.specificDates.length > 0
