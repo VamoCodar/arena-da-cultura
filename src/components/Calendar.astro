@@ -285,8 +285,8 @@ const locationsJSON = JSON.stringify(locations);
   }
 
   // Determine initial date: use today if within valid range, otherwise range start
-  const validStart = "2026-02-01";
-  const validEnd = "2026-08-01";
+  const validStart = "2026-08-01";
+  const validEnd = "2027-01-01";
   const todayStr = new Date().toISOString().slice(0, 10);
   const initialDate =
     todayStr >= validStart && todayStr < validEnd ? todayStr : validStart;
@@ -305,8 +305,8 @@ const locationsJSON = JSON.stringify(locations);
       today: "Hoje",
     },
     validRange: {
-      start: "2026-02-01",
-      end: "2026-08-01",
+      start: "2026-08-01",
+      end: "2027-01-01",
     },
     events: allEvents,
     height: "auto",
