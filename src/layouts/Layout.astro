@@ -6,7 +6,8 @@ interface Props {
   image?: string;
 }
 
-const SITE_URL = "https://arenadacultura.com.br";
+// Fonte única: `site` no astro.config.mjs
+const SITE_URL = (Astro.site?.toString() ?? "https://arena-da-cultura.netlify.app").replace(/\/$/, "");
 const SITE_NAME = "Escola Livre de Artes — Arena da Cultura";
 
 const {

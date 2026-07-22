@@ -5,7 +5,7 @@ import openInEditor from "vite-plugin-open-in-editor";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://arenadacultura.com.br",
+  site: "https://arena-da-cultura.netlify.app",
   integrations: [sitemap()],
   compressHTML: true,
   build: {

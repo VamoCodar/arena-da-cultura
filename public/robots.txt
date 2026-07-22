@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://arenadacultura.com.br/sitemap-index.xml
+Sitemap: https://arena-da-cultura.netlify.app/sitemap-index.xml
